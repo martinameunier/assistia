@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>macOS - Assistia Documentation</title>
+    <link rel="stylesheet" href="../style.css">
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <div class="brand">Assistia - macOS</div>
+        <a class="home-link" href="index.html">Back home</a>
+      </header>
+
+      <section class="hero">
+        <h1>Install Ollama and Open WebUI on macOS</h1>
+        <p>
+          Assistia installs and starts the AI components locally on your Mac.
+        </p>
+      </section>
+
+      <div class="content">
+        <section class="panel">
+          <h2>1. Install from Assistia</h2>
+          <ol>
+            <li>Open Assistia.</li>
+            <li>Click <strong>Settings</strong> at the bottom right.</li>
+            <li>Click <strong>Install missing components</strong>.</li>
+            <li>Assistia checks Ollama and Open WebUI, then installs only what is missing.</li>
+          </ol>
+
+          <p class="note">
+            Open WebUI is installed in Assistia's local data with Python 3.11. If Python 3.11 is not available, Assistia uses <code>uv</code> to prepare it automatically.
+          </p>
+        </section>
+
+        <section class="panel">
+          <h2>2. Manual Ollama installation</h2>
+          <p>
+            You can also install Ollama from the official page:
+            <a href="https://ollama.com/download">Download Ollama</a>.
+          </p>
+          <p>
+            After installation, check in Terminal:
+          </p>
+          <code class="command">ollama --version</code>
+
+          <p>
+            If Assistia cannot find Ollama automatically, enter its path in <strong>Settings</strong>, then <strong>Ollama path</strong>.
+          </p>
+          <div class="path-examples">
+            <strong>Path examples</strong>
+            <ul>
+              <li><span>Apple silicon or Intel</span><code>/usr/local/bin/ollama</code></li>
+              <li><span>Homebrew Apple silicon</span><code>/opt/homebrew/bin/ollama</code></li>
+              <li><span>macOS application</span><code>/Applications/Ollama.app/Contents/Resources/ollama</code></li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>3. Open WebUI</h2>
+          <p>
+            In most cases, leave <strong>Open WebUI path</strong> empty. Assistia will use its managed local installation.
+          </p>
+          <p>
+            If you installed Open WebUI yourself, you can enter a path such as:
+          </p>
+          <code class="command">/usr/local/bin/open-webui
+/opt/homebrew/bin/open-webui</code>
+        </section>
+
+        <section class="panel">
+          <h2>4. Start</h2>
+          <ol>
+            <li>Click <strong>Start</strong>.</li>
+            <li>Assistia starts Ollama on <code>127.0.0.1:11434</code>.</li>
+            <li>Assistia starts Open WebUI on <code>127.0.0.1:8080</code>.</li>
+            <li>Click <strong>Open WebUI</strong> to access the interface.</li>
+          </ol>
+        </section>
+
+        <p class="sources">
+          Main sources: Ollama, Open WebUI and uv.
+        </p>
+      </div>
+    </main>
+  </body>
+</html>

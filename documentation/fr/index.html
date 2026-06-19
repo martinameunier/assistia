@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Documentation Assistia</title>
+    <link rel="stylesheet" href="../style.css">
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <div class="brand">Assistia</div>
+        <a class="home-link" href="../index.html">Choix de la langue</a>
+      </header>
+
+      <section class="hero">
+        <h1>Documentation d'installation et d'utilisation</h1>
+        <p>
+          Assistia installe et lance un environnement IA local avec Ollama et Open WebUI directement sur votre ordinateur.
+        </p>
+      </section>
+
+      <div class="content">
+        <details class="panel">
+          <summary>
+            <h2>1. Comprendre les outils utilisés</h2>
+          </summary>
+          <p>
+            Assistia rassemble plusieurs outils pour vous permettre de discuter avec des modèles d'intelligence artificielle depuis une interface web locale.
+          </p>
+
+          <h3>Ollama</h3>
+          <p>
+            Ollama télécharge et fait fonctionner les modèles d'intelligence artificielle sur votre machine. Assistia démarre son API locale sur <code>127.0.0.1:11434</code> et prépare le modèle <code>qwen3:4b</code>.
+          </p>
+
+          <h3>Open WebUI</h3>
+          <p>
+            Open WebUI est l'interface de discussion affichée dans votre navigateur. Assistia la lance sur <code>127.0.0.1:8080</code> et la connecte à Ollama.
+          </p>
+
+          <h3>Python 3.11 et uv</h3>
+          <p>
+            Open WebUI fonctionne dans un environnement Python local géré par Assistia. Si Python 3.11 n'est pas disponible, Assistia installe <code>uv</code>, récupère Python 3.11, puis installe Open WebUI dans cet environnement.
+          </p>
+
+          <p class="note">
+            En résumé : Ollama fait tourner les modèles, Open WebUI fournit l'interface, et Assistia installe puis démarre les composants nécessaires.
+          </p>
+        </details>
+
+        <details class="panel">
+          <summary>
+            <h2>2. Installer les composants manquants</h2>
+          </summary>
+          <p>
+            Dans Assistia, ouvrez <strong>Paramétrage</strong>, puis cliquez sur <strong>Installer les composants manquants</strong>. L'application vérifie d'abord ce qui est déjà présent avant de lancer une installation.
+          </p>
+
+          <ul>
+            <li>Si Ollama est déjà installé, son installation est ignorée.</li>
+            <li>Si Open WebUI est déjà installé, son installation est ignorée.</li>
+            <li>Si un composant manque, Assistia installe uniquement ce composant.</li>
+          </ul>
+
+          <p class="note">
+            Ollama et Open WebUI restent des logiciels tiers soumis à leurs propres licences et conditions d'utilisation.
+          </p>
+
+          <nav class="os-grid" aria-label="Choix du système d'exploitation">
+            <a class="os-button" href="macos.html">
+              <strong>macOS</strong>
+              <span>Installation locale</span>
+            </a>
+            <a class="os-button" href="windows.html">
+              <strong>Windows</strong>
+              <span>Installation locale</span>
+            </a>
+            <a class="os-button" href="linux.html">
+              <strong>Linux</strong>
+              <span>Installation locale</span>
+            </a>
+          </nav>
+        </details>
+
+        <details class="panel">
+          <summary>
+            <h2>3. Paramétrage dans Assistia</h2>
+          </summary>
+
+          <p>
+            Le bouton <strong>Paramétrage</strong> se trouve en bas à droite de la fenêtre. Il permet de configurer les chemins d'exécutables et de lancer l'installation des composants manquants.
+          </p>
+
+          <h3>Chemin vers Ollama</h3>
+          <p>
+            Laissez ce champ vide pour utiliser la détection automatique. Vous pouvez aussi saisir le chemin complet vers l'exécutable Ollama ou le dossier qui le contient.
+          </p>
+
+          <div class="path-examples">
+            <strong>Exemples</strong>
+            <ul>
+              <li><span>Windows</span><code>C:\Users\vous\AppData\Local\Programs\Ollama\ollama.exe</code></li>
+              <li><span>macOS</span><code>/usr/local/bin/ollama</code></li>
+              <li><span>Linux</span><code>/usr/bin/ollama</code></li>
+            </ul>
+          </div>
+
+          <h3>Chemin vers Open WebUI</h3>
+          <p>
+            Laissez ce champ vide pour utiliser l'installation locale gérée par Assistia. Vous pouvez aussi indiquer un exécutable Open WebUI installé manuellement.
+          </p>
+
+          <div class="path-examples">
+            <strong>Exemples</strong>
+            <ul>
+              <li><span>Windows</span><code>C:\Users\vous\AppData\Roaming\Python\Scripts\open-webui.exe</code></li>
+              <li><span>macOS</span><code>/usr/local/bin/open-webui</code></li>
+              <li><span>Linux</span><code>/usr/local/bin/open-webui</code></li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="panel">
+          <summary>
+            <h2>4. Démarrer et utiliser Open WebUI</h2>
+          </summary>
+
+          <h3>Démarrer les services</h3>
+          <ol>
+            <li>Vérifiez que les composants manquants ont été installés depuis le menu Paramétrage.</li>
+            <li>Cliquez sur <strong>Démarrer</strong>.</li>
+            <li>Assistia démarre Ollama, prépare le modèle <code>qwen3:4b</code>, puis lance Open WebUI.</li>
+            <li>Quand Open WebUI est disponible, cliquez sur <strong>Ouvrir Open WebUI</strong>.</li>
+          </ol>
+
+          <p class="note">
+            Si Open WebUI affiche une erreur au premier lancement, attendez quelques minutes puis actualisez la page. Le téléchargement du modèle ou l'initialisation des services peut prendre du temps.
+          </p>
+
+          <h3>Ajouter un nouveau modèle</h3>
+          <ol>
+            <li>Dans Open WebUI, ouvrez le sélecteur de modèle ou les paramètres d'administration selon votre profil utilisateur.</li>
+            <li>Recherchez un modèle compatible Ollama, par exemple <code>llama3.2</code> ou <code>mistral</code>. <a class="home-link" href="modeles.html">Voir le tableau des modèles</a></li>
+            <li>Lancez le téléchargement du modèle.</li>
+            <li>Attendez la fin de l'installation avant de démarrer une conversation.</li>
+          </ol>
+
+          <img src="../images/ajout_modele.png" width="100%" alt="Ajout d'un modèle dans Open WebUI">
+
+          <h3>Personnaliser un modèle avec un prompt système</h3>
+          <ol>
+            <li>Dans Open WebUI, allez dans l'espace de travail.</li>
+            <li>Cliquez sur + New Model.</li>
+            <li>Entrez un nom de modèle, par exemple : Mon assistant IA personnalisé.</li>
+            <li>Sélectionnez un modèle de base disponible.</li>
+            <li>Ajoutez un prompt système afin de personnaliser votre modèle.</li>
+            <li>Enregistrez la configuration, puis sélectionnez ce modèle personnalisé dans une nouvelle conversation.</li>
+          </ol>
+
+          <img src="../images/exemples-modele-personnalise.png" width="100%" alt="Exemple de modèle personnalisé dans Open WebUI">
+        </details>
+
+        <details class="panel">
+          <summary>
+            <h2>5. Soutenir le projet</h2>
+          </summary>
+          <p>
+            Le bouton <strong>Patreon</strong>, en bas à gauche de l'application, ouvre la page de soutien du projet :
+            <a href="https://www.patreon.com/c/MartinAMeunier">patreon.com/c/MartinAMeunier</a>.
+          </p>
+        </details>
+      </div>
+    </main>
+  </body>
+</html>

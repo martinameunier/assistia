@@ -1,0 +1,55 @@
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+coverage/
+
+# Tauri / Rust outputs
+src-tauri/target/
+src-tauri/gen/schemas/
+
+# Local environment
+.env
+.env.*
+!.env.example
+*.local
+
+# Code signing secrets
+certificates/
+*.pfx
+*.p12
+*.key
+
+# Tool caches
+.vite/
+.eslintcache
+.stylelintcache
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+docker/models/
+docker/webui/
+
+.vscode

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Linux - Documentation Assistia</title>
+    <link rel="stylesheet" href="../style.css">
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <div class="brand">Assistia - Linux</div>
+        <a class="home-link" href="index.html">Retour accueil</a>
+      </header>
+
+      <section class="hero">
+        <h1>Installer Ollama et Open WebUI sur Linux</h1>
+        <p>
+          Assistia installe et lance les composants IA localement sur votre machine Linux.
+        </p>
+      </section>
+
+      <div class="content">
+        <section class="panel">
+          <h2>1. Installation depuis Assistia</h2>
+          <ol>
+            <li>Ouvrez Assistia.</li>
+            <li>Cliquez sur <strong>Paramétrage</strong> en bas à droite.</li>
+            <li>Cliquez sur <strong>Installer les composants manquants</strong>.</li>
+            <li>Assistia vérifie Ollama et Open WebUI, puis installe uniquement ce qui manque.</li>
+          </ol>
+
+          <p class="note">
+            Selon votre distribution, l'installation d'Ollama peut demander des droits administrateur. Suivez les indications affichées par le script officiel si votre terminal ou votre système demande une confirmation.
+          </p>
+        </section>
+
+        <section class="panel">
+          <h2>2. Installation manuelle d'Ollama</h2>
+          <p>
+            Vous pouvez aussi installer Ollama avec la commande officielle :
+          </p>
+          <code class="command">curl -fsSL https://ollama.com/install.sh | sh</code>
+
+          <p>
+            Vérifiez ensuite l'installation :
+          </p>
+          <code class="command">ollama --version</code>
+
+          <p>
+            Si Assistia ne trouve pas Ollama automatiquement, renseignez son chemin dans <strong>Paramétrage</strong> puis <strong>Chemin vers Ollama</strong>.
+          </p>
+          <div class="path-examples">
+            <strong>Exemples de chemins</strong>
+            <ul>
+              <li><span>Linux</span><code>/usr/bin/ollama</code></li>
+              <li><span>Linux</span><code>/usr/local/bin/ollama</code></li>
+              <li><span>Snap</span><code>/snap/bin/ollama</code></li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>3. Open WebUI</h2>
+          <p>
+            Dans la plupart des cas, laissez <strong>Chemin vers Open WebUI</strong> vide. Assistia utilisera son installation locale gérée.
+          </p>
+          <p>
+            Si Python 3.11 n'est pas disponible, Assistia installe <code>uv</code>, puis crée un environnement local avec Python 3.11.
+          </p>
+          <p>
+            Si vous avez installé Open WebUI vous-même, vous pouvez renseigner un chemin comme :
+          </p>
+          <code class="command">/usr/local/bin/open-webui
+/usr/bin/open-webui</code>
+        </section>
+
+        <section class="panel">
+          <h2>4. Démarrage</h2>
+          <ol>
+            <li>Cliquez sur <strong>Démarrer</strong>.</li>
+            <li>Assistia lance Ollama sur <code>127.0.0.1:11434</code>.</li>
+            <li>Assistia lance Open WebUI sur <code>127.0.0.1:8080</code>.</li>
+            <li>Cliquez sur <strong>Ouvrir Open WebUI</strong> pour accéder à l'interface.</li>
+          </ol>
+        </section>
+
+        <p class="sources">
+          Sources principales : Ollama, Open WebUI et uv.
+        </p>
+      </div>
+    </main>
+  </body>
+</html>

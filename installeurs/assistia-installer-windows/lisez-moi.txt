@@ -1,0 +1,12 @@
+Installation Windows d'Assistia
+
+Pour installer le logiciel Assistia, faites un clique droit puis sélectionner Exécuter avec Powershell simplement sur le fichier
+installer.ps1.
+
+Le script installe le certificat Windows necessaire, puis lance
+automatiquement assitia-installer.exe depuis ce meme dossier.
+
+Si Windows demande une autorisation administrateur, acceptez-la pour continuer
+l'installation.
+
+Dans le cas où l'installation du logiciel ne se lancerait pas, double-cliquez sur l'installateur assistia-installer.exe

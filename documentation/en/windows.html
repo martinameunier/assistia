@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Windows - Assistia Documentation</title>
+    <link rel="stylesheet" href="../style.css">
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <div class="brand">Assistia - Windows</div>
+        <a class="home-link" href="index.html">Back home</a>
+      </header>
+
+      <section class="hero">
+        <h1>Install Ollama and Open WebUI on Windows</h1>
+        <p>
+          Assistia installs and starts the AI components locally on your PC.
+        </p>
+      </section>
+
+      <div class="content">
+        <section class="panel">
+          <h2>1. Install from Assistia</h2>
+          <ol>
+            <li>Open Assistia.</li>
+            <li>Click <strong>Settings</strong> at the bottom right.</li>
+            <li>Click <strong>Install missing components</strong>.</li>
+            <li>Assistia checks Ollama and Open WebUI, then installs only what is missing.</li>
+          </ol>
+
+          <p class="note">
+            Open WebUI installation prepares a local Python 3.11 environment. If Python 3.11 is missing, Assistia installs <code>uv</code>, then fetches the correct Python version.
+          </p>
+        </section>
+
+        <section class="panel">
+          <h2>2. Manual Ollama installation</h2>
+          <p>
+            You can also install Ollama from the official page:
+            <a href="https://ollama.com/download/windows">Download Ollama for Windows</a>.
+          </p>
+          <p>
+            After installation, check in PowerShell:
+          </p>
+          <code class="command">ollama --version</code>
+
+          <p>
+            If Assistia cannot find Ollama automatically, enter its path in <strong>Settings</strong>, then <strong>Ollama path</strong>.
+          </p>
+          <div class="path-examples">
+            <strong>Path examples</strong>
+            <ul>
+              <li><span>User install</span><code>C:\Users\you\AppData\Local\Programs\Ollama\ollama.exe</code></li>
+              <li><span>Program Files</span><code>C:\Program Files\Ollama\ollama.exe</code></li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>3. Open WebUI</h2>
+          <p>
+            In most cases, leave <strong>Open WebUI path</strong> empty. Assistia will use its managed local installation.
+          </p>
+          <p>
+            If you installed Open WebUI yourself, you can enter a path such as:
+          </p>
+          <code class="command">C:\Users\you\AppData\Roaming\Python\Scripts\open-webui.exe
+C:\Users\you\AppData\Local\Programs\Python\Python311\Scripts\open-webui.exe</code>
+        </section>
+
+        <section class="panel">
+          <h2>4. Start</h2>
+          <ol>
+            <li>Click <strong>Start</strong>.</li>
+            <li>Assistia starts Ollama on <code>127.0.0.1:11434</code>.</li>
+            <li>Assistia starts Open WebUI on <code>127.0.0.1:8080</code>.</li>
+            <li>Click <strong>Open WebUI</strong> to access the interface.</li>
+          </ol>
+        </section>
+
+        <p class="sources">
+          Main sources: Ollama, Open WebUI and uv.
+        </p>
+      </div>
+    </main>
+  </body>
+</html>
