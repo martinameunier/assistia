@@ -2,9 +2,11 @@ use crate::common::{
     command_output_with_timeout, emit_runtime_log, emit_runtime_status, expand_user_path,
     hide_command_window, kill_matching_processes, kill_process_tree, read_settings,
     run_streaming_command, stream_command_output, tcp_service_ready, wait_until_tcp_service_stops,
-    write_settings, LauncherSettings, ServiceStatus, OLLAMA_API_ADDR, OLLAMA_DEFAULT_MODEL,
+    write_settings, LauncherSettings, ServiceStatus, OLLAMA_API_ADDR,
 };
+use serde::{Deserialize, Serialize};
 use std::env;
+use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
 use std::sync::{Mutex, OnceLock};
@@ -13,6 +15,35 @@ use std::time::{Duration, Instant};
 use tauri::AppHandle;
 
 static OLLAMA_PROCESS: OnceLock<Mutex<Option<Child>>> = OnceLock::new();
+
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OllamaInstalledModel {
+    pub name: String,
+}
+
+#[derive(Clone, Deserialize, Serialize)]
+pub struct OllamaChatMessage {
+    pub role: String,
+    pub content: String,
+}
+
+#[derive(Serialize)]
+pub struct OllamaChatResponse {
+    pub message: String,
+}
+
+#[derive(Deserialize)]
+struct OllamaApiChatMessage {
+    content: String,
+}
+
+#[derive(Deserialize)]
+struct OllamaApiChatResponse {
+    message: Option<OllamaApiChatMessage>,
+    response: Option<String>,
+    error: Option<String>,
+}
 
 fn ollama_process() -> &'static Mutex<Option<Child>> {
     OLLAMA_PROCESS.get_or_init(|| Mutex::new(None))
@@ -258,25 +289,7 @@ fn wait_for_ollama(app: &AppHandle) -> Result<(), String> {
     Err("Ollama ne répond pas après 120 secondes.".to_string())
 }
 
-fn pull_default_model(app: &AppHandle) -> Result<(), String> {
-    emit_runtime_status(app, "Téléchargement du modèle Ollama...", 65);
-    emit_runtime_log(
-        app,
-        format!("Vérification du modèle Ollama {OLLAMA_DEFAULT_MODEL}."),
-    );
-
-    let mut command = ollama_command(Some(app));
-    command.arg("pull").arg(OLLAMA_DEFAULT_MODEL);
-
-    run_streaming_command(app, command, "ollama", "Téléchargement du modèle Ollama")?;
-
-    emit_runtime_status(app, "Modèle Ollama prêt.", 95);
-    emit_runtime_log(app, format!("Modèle {OLLAMA_DEFAULT_MODEL} prêt."));
-
-    Ok(())
-}
-
-pub(crate) fn ensure_ollama_runtime(app: &AppHandle) -> Result<(), String> {
+pub(crate) fn ensure_ollama_server(app: &AppHandle) -> Result<(), String> {
     emit_runtime_status(app, "Préparation d'Ollama...", 5);
 
     if !ollama_installed(app) {
@@ -286,18 +299,222 @@ pub(crate) fn ensure_ollama_runtime(app: &AppHandle) -> Result<(), String> {
 
     if ollama_api_ready() {
         emit_runtime_log(app, "Ollama est déjà en cours d'exécution.");
-        emit_runtime_status(app, "Ollama est prêt.", 55);
-    } else {
-        start_ollama_process(app)?;
-        wait_for_ollama(app)?;
+        emit_runtime_status(app, "Ollama est prêt.", 100);
+        return Ok(());
     }
 
-    pull_default_model(app)?;
-
-    emit_runtime_log(app, "Ollama est prêt pour Open WebUI.");
-    emit_runtime_status(app, "Ollama est prêt pour Open WebUI.", 70);
+    start_ollama_process(app)?;
+    wait_for_ollama(app)?;
+    emit_runtime_status(app, "Ollama est prêt.", 100);
 
     Ok(())
+}
+
+pub(crate) fn installed_models(app: &AppHandle) -> Result<Vec<OllamaInstalledModel>, String> {
+    if !ollama_installed(app) {
+        return Ok(Vec::new());
+    }
+
+    let mut command = ollama_command(Some(app));
+    command.arg("list");
+
+    let output = command_output_with_timeout(command, Duration::from_secs(10), "Liste Ollama")?;
+
+    if !output.status.success() {
+        return Ok(Vec::new());
+    }
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+
+    Ok(stdout
+        .lines()
+        .skip(1)
+        .filter_map(|line| line.split_whitespace().next())
+        .map(|name| OllamaInstalledModel {
+            name: name.to_string(),
+        })
+        .collect())
+}
+
+pub(crate) fn pull_model(app: &AppHandle, model: String) -> Result<(), String> {
+    let model = model.trim();
+
+    if model.is_empty() {
+        return Err("Le modèle Ollama est vide.".to_string());
+    }
+
+    ensure_ollama_server(app)?;
+
+    emit_runtime_status(app, "Téléchargement du modèle Ollama...", 10);
+    emit_runtime_log(app, format!("Téléchargement du modèle Ollama {model}."));
+
+    let mut command = ollama_command(Some(app));
+    command.arg("pull").arg(model);
+
+    run_streaming_command(
+        app,
+        command,
+        "ollama-models",
+        "Téléchargement du modèle Ollama",
+    )?;
+
+    emit_runtime_status(app, "Modèle Ollama prêt.", 100);
+    emit_runtime_log(app, format!("Modèle {model} prêt."));
+
+    Ok(())
+}
+
+pub(crate) fn delete_model(app: &AppHandle, model: String) -> Result<(), String> {
+    let model = model.trim();
+
+    if model.is_empty() {
+        return Err("Le modèle Ollama est vide.".to_string());
+    }
+
+    emit_runtime_status(app, "Suppression du modèle Ollama...", 10);
+    emit_runtime_log(app, format!("Suppression du modèle Ollama {model}."));
+
+    let mut command = ollama_command(Some(app));
+    command.arg("rm").arg(model);
+
+    run_streaming_command(
+        app,
+        command,
+        "ollama-models",
+        "Suppression du modèle Ollama",
+    )?;
+
+    emit_runtime_status(app, "Modèle Ollama supprimé.", 100);
+    emit_runtime_log(app, format!("Modèle {model} supprimé."));
+
+    Ok(())
+}
+
+fn find_header_end(response: &[u8]) -> Option<usize> {
+    response
+        .windows(4)
+        .position(|window| window == b"\r\n\r\n")
+        .map(|position| position + 4)
+}
+
+fn decode_chunked_body(body: &[u8]) -> Result<Vec<u8>, String> {
+    let mut decoded = Vec::new();
+    let mut offset = 0;
+
+    loop {
+        let Some(line_end) = body[offset..]
+            .windows(2)
+            .position(|window| window == b"\r\n")
+            .map(|position| offset + position)
+        else {
+            return Err("Réponse Ollama chunked invalide.".to_string());
+        };
+
+        let size_line = String::from_utf8_lossy(&body[offset..line_end]);
+        let size_token = size_line.split(';').next().unwrap_or("").trim();
+        let size = usize::from_str_radix(size_token, 16).map_err(|e| e.to_string())?;
+
+        offset = line_end + 2;
+
+        if size == 0 {
+            break;
+        }
+
+        let chunk_end = offset + size;
+
+        if chunk_end > body.len() {
+            return Err("Réponse Ollama chunked incomplète.".to_string());
+        }
+
+        decoded.extend_from_slice(&body[offset..chunk_end]);
+        offset = chunk_end + 2;
+    }
+
+    Ok(decoded)
+}
+
+fn read_http_body(response: &[u8]) -> Result<Vec<u8>, String> {
+    let header_end =
+        find_header_end(response).ok_or_else(|| "Réponse HTTP Ollama invalide.".to_string())?;
+    let headers = String::from_utf8_lossy(&response[..header_end]).to_ascii_lowercase();
+    let body = &response[header_end..];
+
+    if headers.contains("transfer-encoding: chunked") {
+        return decode_chunked_body(body);
+    }
+
+    Ok(body.to_vec())
+}
+
+pub(crate) fn send_chat_message(
+    app: &AppHandle,
+    model: String,
+    messages: Vec<OllamaChatMessage>,
+) -> Result<OllamaChatResponse, String> {
+    let model = model.trim();
+
+    if model.is_empty() {
+        return Err("Sélectionnez un modèle Ollama.".to_string());
+    }
+
+    ensure_ollama_server(app)?;
+
+    let body = serde_json::json!({
+        "model": model,
+        "messages": messages,
+        "stream": false
+    })
+    .to_string();
+
+    let request = format!(
+        "POST /api/chat HTTP/1.1\r\nHost: {OLLAMA_API_ADDR}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+        body.len()
+    );
+
+    let mut stream = std::net::TcpStream::connect(OLLAMA_API_ADDR).map_err(|e| e.to_string())?;
+    stream
+        .set_read_timeout(Some(Duration::from_secs(300)))
+        .map_err(|e| e.to_string())?;
+    stream
+        .set_write_timeout(Some(Duration::from_secs(30)))
+        .map_err(|e| e.to_string())?;
+    stream
+        .write_all(request.as_bytes())
+        .map_err(|e| e.to_string())?;
+
+    let mut response = Vec::new();
+    stream
+        .read_to_end(&mut response)
+        .map_err(|e| e.to_string())?;
+
+    let response_start = String::from_utf8_lossy(&response[..response.len().min(64)]);
+
+    if !response_start.starts_with("HTTP/1.1 200") && !response_start.starts_with("HTTP/1.0 200") {
+        let body = read_http_body(&response).unwrap_or_default();
+        let error_body = String::from_utf8_lossy(&body).trim().to_string();
+
+        return Err(if error_body.is_empty() {
+            "Ollama n'a pas accepté la demande de chat.".to_string()
+        } else {
+            error_body
+        });
+    }
+
+    let body = read_http_body(&response)?;
+    let chat_response: OllamaApiChatResponse =
+        serde_json::from_slice(&body).map_err(|e| e.to_string())?;
+
+    if let Some(error) = chat_response.error {
+        return Err(error);
+    }
+
+    let message = chat_response
+        .message
+        .map(|message| message.content)
+        .or(chat_response.response)
+        .unwrap_or_default();
+
+    Ok(OllamaChatResponse { message })
 }
 
 pub(crate) fn stop_ollama_runtime(app: &AppHandle) -> Result<String, String> {

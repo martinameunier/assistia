@@ -1,0 +1,25 @@
+sequenceDiagram
+  actor U as Utilisateur
+  participant Page as ImageGeneratorPage.tsx
+  participant Workflow as imageGeneratorModels.ts
+  participant Tauri as services/tauris.ts
+  participant Main as main.rs
+  participant Comfy as comfyui.rs
+  participant API as API ComfyUI
+
+  U->>Page: Choisit un modèle et saisit un prompt
+  Page->>Workflow: buildWorkflowForPrompt(modele, prompt)
+  Workflow-->>Page: Workflow JSON cloné et modifié
+  Page->>Tauri: queueComfyUIImageGeneration(workflow)
+  Tauri->>Main: invoke queue_comfyui_image_generation
+  Main->>Comfy: queue_image_generation(app, workflow)
+  Comfy->>API: POST /prompt
+  API-->>Comfy: prompt_id
+  loop Jusqu'à image ou timeout
+    Comfy->>API: GET /history/prompt_id
+    API-->>Comfy: état + sorties
+  end
+  Comfy-->>Main: image en data URL
+  Main-->>Tauri: ComfyUIImageGenerationResponse
+  Tauri-->>Page: prompt_id + image
+  Page-->>U: Affiche l'image et le bouton enregistrer

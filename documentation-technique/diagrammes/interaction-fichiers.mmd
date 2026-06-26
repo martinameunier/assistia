@@ -1,0 +1,51 @@
+flowchart LR
+  subgraph Frontend["src"]
+    MainTsx["main.tsx"] --> App["app.tsx"]
+    App --> Shell["layout/AppShell.tsx"]
+    App --> ChatPage["pages/ChatPage.tsx"]
+    App --> ImagePage["pages/ImageGeneratorPage.tsx"]
+    App --> AgentPage["pages/DeveloperAgentPage.tsx"]
+    App --> SettingsPage["pages/SettingsPage.tsx"]
+    App --> LogsPage["pages/LogsPage.tsx"]
+    App --> ChatProvider["contexts/ChatContext.tsx"]
+    App --> AgentProvider["contexts/DeveloperAgentChatContext.tsx"]
+    App --> RuntimeHooks["hooks runtime, status et events"]
+    App --> ModelHooks["hooks actions et disponibilité modèles"]
+    RuntimeHooks --> Store["store/launcherStore.ts"]
+    ModelHooks --> Store
+    ChatPage --> ChatProvider
+    AgentPage --> AgentProvider
+    ImagePage --> WorkflowUtil["utils/imageGeneratorModels.ts"]
+    WorkflowUtil --> ModelConfig["config imageGeneratorModels + workflows"]
+  end
+
+  subgraph Bridge["Pont Tauri"]
+    RuntimeHooks --> TauriService["services/tauris.ts"]
+    ModelHooks --> TauriService
+    ChatPage --> TauriService
+    ImagePage --> TauriService
+    AgentPage --> TauriService
+    SettingsPage --> TauriService
+  end
+
+  subgraph Backend["src-tauri/src"]
+    TauriService --> RustMain["main.rs"]
+    RustMain --> Common["common.rs"]
+    RustMain --> OllamaRs["ollama.rs"]
+    RustMain --> ComfyRs["comfyui.rs"]
+    RustMain --> AgentRs["dev_agent.rs"]
+    RustMain --> WebSearchRs["web_search.rs"]
+    RustMain --> SearxngRs["searxng.rs"]
+    RustMain --> InstallRs["installation.rs"]
+    InstallRs --> PythonRs["python.rs"]
+    InstallRs --> OpenWebUiRs["openwebui.rs"]
+    InstallRs --> SearxngRs
+  end
+
+  OllamaRs --> OllamaProc["ollama serve"]
+  ComfyRs --> ComfyProc["python main.py ComfyUI"]
+  AgentRs --> AiderProc["aider-chat"]
+  WebSearchRs --> SearXNG["SearXNG /search JSON"]
+  SearxngRs --> SearXNGProc["python -m searx.webapp"]
+  SearXNGProc --> SearXNG
+  Common --> Store

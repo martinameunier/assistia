@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Assistia - Developer agent</title><link rel="stylesheet" href="../style.css"></head>
+  <body>
+    <main class="page">
+      <header class="topbar"><div class="brand">Assistia</div><a class="home-link" href="index.html">Table of contents</a></header>
+      <section class="hero"><h1 class="title-with-icon"><span class="doc-icon icon-code" aria-hidden="true"></span><span>Chapter 4 - Developer agent tab</span></h1><p>Understand the assistant that can help modify a software project.</p></section>
+      <div class="chapter-layout">
+        <div class="content">
+          <section class="panel">
+            <h2>Role of the tab</h2>
+            <p>This tab is for people who want to modify a software project. The agent can read the configured folder, suggest changes, and display a summary.</p>
+            <p class="note">If you do not know what a project folder or Git is, ask for advice before using this tab. It can modify files.</p>
+          </section>
+          <section class="panel">
+            <h2>Buttons and elements</h2>
+            <div class="button-list">
+              <div class="button-card button-card--icon icon-code"><strong>Status</strong>Shows whether the agent is ready, incorrectly configured, or missing components.</div>
+              <div class="button-card button-card--icon icon-download"><strong>Install Ollama</strong>Appears when Ollama is missing. Ollama is required for the agent to use a local model.</div>
+              <div class="button-card button-card--icon icon-download"><strong>Install agent</strong>Appears when Aider is not installed. It installs the developer agent.</div>
+              <div class="button-card button-card--icon icon-settings"><strong>Settings button</strong>Opens the tab where you enter the Ollama URL, project folder, and model.</div>
+              <div class="button-card"><strong>Configuration summary</strong>Shows the Ollama address, project folder, and model being used.</div>
+              <div class="button-card"><strong>Conversation area</strong>Shows your requests and the agent's answers.</div>
+              <div class="button-card"><strong>Message field</strong>Describe what you want to change in the project.</div>
+              <div class="button-card button-card--icon icon-send"><strong>Send button</strong>Sends your request to the agent.</div>
+              <div class="button-card button-card--icon icon-code"><strong>Git status and diff</strong>If the project uses Git, Assistia can show detected changes to help you review the work.</div>
+            </div>
+          </section>
+          <nav class="chapter-nav" aria-label="Chapter navigation"><a href="image-generator.html">Previous chapter: Image generator</a><a href="settings.html">Next chapter: Settings</a></nav>
+        </div>
+        <aside class="chapter-sidebar"><strong>In this chapter</strong><a href="index.html">Table of contents</a><a href="settings.html">Configure the agent</a><a href="chat.html">Download a chat model</a></aside>
+      </div>
+    </main>
+  </body>
+</html>

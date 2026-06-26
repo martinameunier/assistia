@@ -1,0 +1,47 @@
+export type OllamaModelSuggestion = {
+  label: string;
+  name: string;
+};
+
+export const OLLAMA_MODEL_SUGGESTIONS: OllamaModelSuggestion[] = [
+  { name: "llama3.3:70b", label: "Meta Llama 3.3 70B" },
+  { name: "llama3.2:3b", label: "Meta Llama 3.2 3B" },
+  { name: "llama3.2:1b", label: "Meta Llama 3.2 1B" },
+  { name: "llama3.1:8b", label: "Meta Llama 3.1 8B" },
+  { name: "llama3.1:70b", label: "Meta Llama 3.1 70B" },
+  { name: "qwen3:32b", label: "Qwen3 32B" },
+  { name: "qwen3:14b", label: "Qwen3 14B" },
+  { name: "qwen3:8b", label: "Qwen3 8B" },
+  { name: "qwen3:4b", label: "Qwen3 4B" },
+  { name: "qwen3:1.7b", label: "Qwen3 1.7B" },
+  { name: "qwen3:0.6b", label: "Qwen3 0.6B" },
+  { name: "qwen2.5:32b", label: "Qwen2.5 32B" },
+  { name: "qwen2.5:14b", label: "Qwen2.5 14B" },
+  { name: "qwen2.5:7b", label: "Qwen2.5 7B" },
+  { name: "qwen2.5:3b", label: "Qwen2.5 3B" },
+  { name: "qwen2.5-coder:7b", label: "Qwen2.5 Coder 7B" },
+  { name: "qwen2.5-coder:14b", label: "Qwen2.5 Coder 14B" },
+  { name: "qwen2.5-coder:32b", label: "Qwen2.5 Coder 32B" },
+  { name: "mistral:7b", label: "Mistral 7B" },
+  { name: "mistral-nemo:12b", label: "Mistral Nemo 12B" },
+  { name: "mixtral:8x7b", label: "Mixtral 8x7B" },
+  { name: "gemma3:27b", label: "Gemma 3 27B" },
+  { name: "gemma3:12b", label: "Gemma 3 12B" },
+  { name: "gemma3:4b", label: "Gemma 3 4B" },
+  { name: "gemma3:1b", label: "Gemma 3 1B" },
+  { name: "gemma2:27b", label: "Gemma 2 27B" },
+  { name: "gemma2:9b", label: "Gemma 2 9B" },
+  { name: "deepseek-r1:70b", label: "DeepSeek R1 70B" },
+  { name: "deepseek-r1:32b", label: "DeepSeek R1 32B" },
+  { name: "deepseek-r1:14b", label: "DeepSeek R1 14B" },
+  { name: "deepseek-r1:8b", label: "DeepSeek R1 8B" },
+  { name: "deepseek-r1:7b", label: "DeepSeek R1 7B" },
+  { name: "deepseek-r1:1.5b", label: "DeepSeek R1 1.5B" },
+  { name: "phi4:14b", label: "Phi-4 14B" },
+  { name: "phi3:mini", label: "Phi-3 Mini" },
+  { name: "codellama:7b", label: "Code Llama 7B" },
+  { name: "codellama:13b", label: "Code Llama 13B" },
+  { name: "llava:7b", label: "LLaVA 7B" },
+  { name: "nomic-embed-text", label: "Nomic Embed Text" },
+  { name: "tinyllama:1.1b", label: "TinyLlama 1.1B" }
+];

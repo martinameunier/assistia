@@ -14,7 +14,10 @@
       </header>
 
       <section class="hero">
-        <h1>Install Ollama and Open WebUI on Linux</h1>
+        <h1 class="title-with-icon">
+          <span class="doc-icon icon-download" aria-hidden="true"></span>
+          <span>Install Assistia and its AI components on Linux</span>
+        </h1>
         <p>
           Assistia installs and starts the AI components locally on your Linux machine.
         </p>
@@ -27,7 +30,7 @@
             <li>Open Assistia.</li>
             <li>Click <strong>Settings</strong> at the bottom right.</li>
             <li>Click <strong>Install missing components</strong>.</li>
-            <li>Assistia checks Ollama and Open WebUI, then installs only what is missing.</li>
+            <li>Assistia checks Ollama, ComfyUI, and the developer agent, then installs only what is missing.</li>
           </ol>
 
           <p class="note">
@@ -61,32 +64,30 @@
         </section>
 
         <section class="panel">
-          <h2>3. Open WebUI</h2>
+          <h2>3. ComfyUI and developer agent</h2>
           <p>
-            In most cases, leave <strong>Open WebUI path</strong> empty. Assistia will use its managed local installation.
+            In most cases, no extra system configuration is required. Assistia installs ComfyUI and Aider inside its own application folders.
           </p>
           <p>
-            If Python 3.11 is not available, Assistia installs <code>uv</code>, then creates a local environment with Python 3.11.
+            If the required Python version is not available, Assistia installs <code>uv</code>, then creates the local environment for the module.
           </p>
           <p>
-            If you installed Open WebUI yourself, you can enter a path such as:
+            After installation, download models from <strong>Settings</strong>: Ollama models for chat and ComfyUI models for image generation.
           </p>
-          <code class="command">/usr/local/bin/open-webui
-/usr/bin/open-webui</code>
         </section>
 
         <section class="panel">
           <h2>4. Start</h2>
           <ol>
-            <li>Click <strong>Start</strong>.</li>
-            <li>Assistia starts Ollama on <code>127.0.0.1:11434</code>.</li>
-            <li>Assistia starts Open WebUI on <code>127.0.0.1:8080</code>.</li>
-            <li>Click <strong>Open WebUI</strong> to access the interface.</li>
+            <li>Open Assistia.</li>
+            <li>Assistia starts Ollama on <code>127.0.0.1:11434</code> when the component is installed but stopped.</li>
+            <li>If ComfyUI is installed, Assistia also tries to start its server on <code>127.0.0.1:8188</code>.</li>
+            <li>Use the <strong>Chat</strong> tab to talk and the <strong>Image generator</strong> tab to create images.</li>
           </ol>
         </section>
 
         <p class="sources">
-          Main sources: Ollama, Open WebUI and uv.
+          Main sources: Ollama, ComfyUI, Aider and uv.
         </p>
       </div>
     </main>

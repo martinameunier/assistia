@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Assistia - Agent développeur</title>
+    <link rel="stylesheet" href="../style.css">
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <div class="brand">Assistia</div>
+        <a class="home-link" href="index.html">Sommaire</a>
+      </header>
+
+      <section class="hero">
+        <h1 class="title-with-icon">
+          <span class="doc-icon icon-code" aria-hidden="true"></span>
+          <span>Chapitre 4 - Onglet Agent développeur</span>
+        </h1>
+        <p>Comprendre l'assistant qui peut aider à modifier un projet informatique.</p>
+      </section>
+
+      <div class="chapter-layout">
+        <div class="content">
+          <section class="panel">
+            <h2>Rôle de l'onglet</h2>
+            <p>Cet onglet est destiné aux personnes qui veulent modifier un projet informatique. L'agent peut lire le dossier configuré, proposer des changements et afficher un résumé.</p>
+            <p class="note">Si vous ne savez pas ce qu'est un dossier projet ou Git, demandez conseil avant d'utiliser cet onglet. Il peut modifier des fichiers.</p>
+          </section>
+
+          <section class="panel">
+            <h2>Boutons et éléments</h2>
+            <div class="button-list">
+              <div class="button-card button-card--icon icon-code"><strong>Statut</strong>Indique si l'agent est prêt, mal configuré ou si des composants manquent.</div>
+              <div class="button-card button-card--icon icon-download"><strong>Installer Ollama</strong>Apparaît si Ollama manque. Ollama est nécessaire pour que l'agent utilise un modèle local.</div>
+              <div class="button-card button-card--icon icon-download"><strong>Installer l'agent</strong>Apparaît si Aider n'est pas installé. Il lance l'installation de l'agent développeur.</div>
+              <div class="button-card button-card--icon icon-settings"><strong>Bouton Paramètres</strong>Ouvre l'onglet où renseigner l'URL Ollama, le dossier du projet et le modèle.</div>
+              <div class="button-card"><strong>Résumé de configuration</strong>Affiche l'adresse Ollama, le dossier projet et le modèle utilisés.</div>
+              <div class="button-card"><strong>Zone de discussion</strong>Affiche vos demandes et les réponses de l'agent.</div>
+              <div class="button-card"><strong>Champ de message</strong>Décrivez ce que vous voulez modifier dans le projet.</div>
+              <div class="button-card button-card--icon icon-send"><strong>Bouton Envoyer</strong>Lance la demande auprès de l'agent.</div>
+              <div class="button-card button-card--icon icon-code"><strong>Statut Git et diff</strong>Si le projet utilise Git, Assistia peut afficher les changements détectés pour vous aider à vérifier le travail.</div>
+            </div>
+          </section>
+
+          <nav class="chapter-nav" aria-label="Navigation entre chapitres">
+            <a href="generateur-image.html">Chapitre précédent : Générateur d'image</a>
+            <a href="parametres.html">Chapitre suivant : Paramètres</a>
+          </nav>
+        </div>
+
+        <aside class="chapter-sidebar">
+          <strong>Dans ce chapitre</strong>
+          <a href="index.html">Sommaire</a>
+          <a href="parametres.html">Configurer l'agent</a>
+          <a href="chat.html">Télécharger un modèle de chat</a>
+        </aside>
+      </div>
+    </main>
+  </body>
+</html>

@@ -3,6 +3,9 @@ import React, {
   useRef
 } from "react";
 
+import LinkifiedText
+from "./LinkifiedText";
+
 type Props = {
   logs: string[];
 };
@@ -30,7 +33,12 @@ export default function LogConsole({
       ref={consoleRef}
       className="log-console"
     >
-      {logs.join("\n")}
+      {logs.map((log, index) => (
+        <React.Fragment key={`${log}-${index}`}>
+          <LinkifiedText text={log} />
+          {index < logs.length - 1 ? "\n" : null}
+        </React.Fragment>
+      ))}
     </pre>
   );
 }

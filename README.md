@@ -1,11 +1,12 @@
 # Assistia
 
-Assistia est une application desktop Tauri + React pour installer, demarrer et piloter un environnement IA local avec Ollama et Open WebUI.
+Assistia est une application desktop Tauri + React pour installer, demarrer et piloter un environnement IA local avec Ollama, Open WebUI et ComfyUI.
 
 L'application lance les services localement sur la machine de l'utilisateur :
 
 - Ollama expose son API sur <http://127.0.0.1:11434>.
 - Open WebUI expose son interface sur <http://127.0.0.1:8080>.
+- ComfyUI expose son interface sur <http://127.0.0.1:8188>.
 - Open WebUI est connecte a Ollama avec `OLLAMA_BASE_URL=http://127.0.0.1:11434`.
 - Le modele prepare par Assistia est `qwen3:4b`.
 
@@ -15,11 +16,13 @@ Au lancement, Assistia sait :
 
 - detecter l'installation d'Ollama ;
 - detecter l'installation d'Open WebUI ;
+- detecter l'installation de ComfyUI ;
 - installer uniquement les composants manquants depuis le menu `Parametrage` ;
 - demarrer Ollama avec `ollama serve` si l'API locale ne repond pas encore ;
 - telecharger ou verifier le modele `qwen3:4b` avec `ollama pull qwen3:4b` ;
 - preparer Open WebUI dans un environnement Python local si necessaire ;
-- lancer Open WebUI avec `open-webui serve --host 127.0.0.1 --port 8080`.
+- lancer Open WebUI avec `open-webui serve --host 127.0.0.1 --port 8080` ;
+- preparer et lancer ComfyUI depuis la page `Generateur d'image`.
 
 ## Prerequis de developpement
 
@@ -165,6 +168,29 @@ Exemples :
 
 Documentation officielle Open WebUI : <https://docs.openwebui.com/>
 
+## Installation de ComfyUI
+
+Assistia peut installer ComfyUI dans un environnement local gere par l'application.
+
+Dans le menu `Parametrage`, cliquez sur `Installer les composants manquants`, ou utilisez la page `Generateur d'image`. Si ComfyUI est absent, l'application :
+
+- prepare un dossier local dans les donnees applicatives d'Assistia ;
+- telecharge et extrait l'archive officielle depuis <https://github.com/Comfy-Org/ComfyUI> ;
+- installe `uv` si necessaire ;
+- prepare Python 3.13 via `uv` ;
+- cree un environnement Python local ;
+- installe les dependances avec `uv pip install --python <python_du_venv> --upgrade -r requirements.txt`.
+
+ComfyUI est ensuite lance avec :
+
+```bash
+python main.py --listen 127.0.0.1 --port 8188 --disable-api-nodes
+```
+
+La page `Generateur d'image` permet d'installer, demarrer, ouvrir et arreter le serveur local ComfyUI.
+
+Documentation officielle ComfyUI : <https://github.com/Comfy-Org/ComfyUI>
+
 ## Parametrage dans l'application
 
 Le bouton `Parametrage` se trouve en bas a droite de la fenetre.
@@ -175,7 +201,7 @@ Le menu contient :
 - `Chemin vers Open WebUI` : chemin complet vers l'executable Open WebUI ou vers le dossier qui le contient.
 - `Installer les composants manquants` : bouton unique qui installe uniquement ce qui manque.
 
-Si les chemins sont vides, Assistia utilise la detection automatique. Pour Open WebUI, Assistia privilegie son installation locale geree si aucun chemin personnalise n'est fourni.
+Si les chemins sont vides, Assistia utilise la detection automatique. Pour Open WebUI, Assistia privilegie son installation locale geree si aucun chemin personnalise n'est fourni. Pour ComfyUI, Assistia utilise son installation locale geree.
 
 ## Demarrage des services
 
@@ -191,6 +217,8 @@ Au demarrage, Assistia :
 - demarre Open WebUI sur <http://127.0.0.1:8080>.
 
 Le bouton `Ouvrir Open WebUI` ouvre l'interface web quand elle est disponible.
+
+La page `Generateur d'image` lance ComfyUI separement sur <http://127.0.0.1:8188>.
 
 Le bouton `Patreon`, en bas a gauche, ouvre <https://www.patreon.com/c/MartinAMeunier>.
 
@@ -210,6 +238,7 @@ Le resultat de compilation se trouve dans `src-tauri/target/release/bundle/`.
 - Ollama : <https://ollama.com/>
 - Ollama CLI : <https://docs.ollama.com/cli>
 - Open WebUI : <https://docs.openwebui.com/>
+- ComfyUI : <https://github.com/Comfy-Org/ComfyUI>
 - uv : <https://docs.astral.sh/uv/>
 - Node.js : <https://nodejs.org/>
 - Rust : <https://www.rust-lang.org/tools/install>
@@ -218,4 +247,4 @@ Le resultat de compilation se trouve dans `src-tauri/target/release/bundle/`.
 
 Assistia est distribue sous une licence proprietaire limitee aux usages non commerciaux. Consultez [LICENSE.md](LICENSE.md) pour les conditions completes.
 
-L'utilisation d'Assistia reste egalement soumise au respect des licences et conditions applicables a Ollama, Open WebUI, aux bibliotheques tierces et aux modeles telecharges ou utilises.
+L'utilisation d'Assistia reste egalement soumise au respect des licences et conditions applicables a Ollama, Open WebUI, ComfyUI, aux bibliotheques tierces et aux modeles telecharges ou utilises.

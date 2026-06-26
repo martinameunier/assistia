@@ -19,8 +19,12 @@ const displayedServices: DisplayedService[] = [
     serviceName: "ollama"
   },
   {
-    labelKey: "openWebUI",
-    serviceName: "open-webui"
+    labelKey: "comfyUI",
+    serviceName: "comfyui"
+  },
+  {
+    labelKey: "developerAgent",
+    serviceName: "developer-agent"
   }
 ];
 

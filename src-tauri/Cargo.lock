@@ -51,9 +51,11 @@ checksum = "7f202df86484c868dbad7eaa557ef785d5c66295e41b460ef922eca0723b842c"
 name = "assistia"
 version = "0.1.0"
 dependencies = [
+ "base64 0.22.1",
  "open",
  "serde",
  "serde_json",
+ "sha2",
  "sysinfo",
  "tauri",
  "tauri-build",

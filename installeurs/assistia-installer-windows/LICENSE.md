@@ -22,11 +22,11 @@ La présente licence ne transfère aucun droit de propriété intellectuelle sur
  
 4. Composants tiers et modèles d'IA
 
-Assistia peut installer, lancer, configurer ou interagir avec des logiciels, services, bibliothèques, modèles d'intelligence artificielle ou autres composants tiers, notamment Ollama, Open WebUI et les modèles téléchargés ou utilisés via Ollama ou Open WebUI.
+Assistia peut installer, lancer, configurer ou interagir avec des logiciels, services, bibliothèques, modèles d'intelligence artificielle ou autres composants tiers, notamment Ollama, Open WebUI, ComfyUI et les modèles téléchargés ou utilisés via Ollama, Open WebUI ou ComfyUI.
 
 Ces composants tiers ne sont pas couverts par la présente licence, sauf mention contraire expresse. Leur utilisation est soumise à leurs propres licences, conditions d'utilisation, restrictions et obligations.
 
-L'utilisateur est seul responsable de vérifier et de respecter les licences et conditions applicables à Ollama, Open WebUI, aux bibliothèques tierces et à chaque modèle d'intelligence artificielle téléchargé, installé ou utilisé avec Assistia.
+L'utilisateur est seul responsable de vérifier et de respecter les licences et conditions applicables à Ollama, Open WebUI, ComfyUI, aux bibliothèques tierces et à chaque modèle d'intelligence artificielle téléchargé, installé ou utilisé avec Assistia.
 
 En cas de contradiction entre la présente licence et la licence d'un composant tiers, la licence du composant tiers s'applique à ce composant tiers.
  

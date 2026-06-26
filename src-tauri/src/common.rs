@@ -17,12 +17,19 @@ use std::os::windows::process::CommandExt;
 #[cfg(target_os = "windows")]
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
-pub(crate) const OLLAMA_DEFAULT_MODEL: &str = "qwen3:4b";
 pub(crate) const OLLAMA_API_ADDR: &str = "127.0.0.1:11434";
 pub(crate) const OLLAMA_BASE_URL: &str = "http://127.0.0.1:11434";
+#[allow(dead_code)]
 pub(crate) const OPEN_WEBUI_ADDR: &str = "127.0.0.1:8080";
+#[allow(dead_code)]
 pub(crate) const OPEN_WEBUI_URL: &str = "http://127.0.0.1:8080";
 pub(crate) const OPEN_WEBUI_PYTHON_VERSION: &str = "3.11";
+pub(crate) const COMFYUI_ADDR: &str = "127.0.0.1:8188";
+pub(crate) const COMFYUI_URL: &str = "http://127.0.0.1:8188";
+pub(crate) const COMFYUI_PYTHON_VERSION: &str = "3.13";
+pub(crate) const AIDER_DEFAULT_MODEL: &str = "qwen2.5-coder:7b";
+pub(crate) const SEARXNG_ADDR: &str = "127.0.0.1:8888";
+pub(crate) const DEFAULT_SEARXNG_URL: &str = "http://127.0.0.1:8888";
 
 #[derive(Serialize)]
 pub struct ServiceStatus {
@@ -36,10 +43,62 @@ struct RuntimeProgressEvent {
     progress: u8,
 }
 
+#[derive(Clone, Deserialize, Serialize)]
+#[serde(default, rename_all = "camelCase")]
+pub(crate) struct DeveloperAgentSettings {
+    pub(crate) ollama_url: String,
+    pub(crate) project_path: String,
+    pub(crate) model: String,
+}
+
+impl Default for DeveloperAgentSettings {
+    fn default() -> Self {
+        Self {
+            ollama_url: OLLAMA_BASE_URL.to_string(),
+            project_path: String::new(),
+            model: AIDER_DEFAULT_MODEL.to_string(),
+        }
+    }
+}
+
+#[derive(Clone, Deserialize, Serialize)]
+#[serde(default, rename_all = "camelCase")]
+pub(crate) struct WebSearchSettings {
+    pub(crate) enabled: bool,
+    pub(crate) searxng_url: String,
+    pub(crate) max_results: usize,
+}
+
+impl Default for WebSearchSettings {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            searxng_url: DEFAULT_SEARXNG_URL.to_string(),
+            max_results: 5,
+        }
+    }
+}
+
+#[derive(Default, Deserialize, Serialize)]
+#[serde(default, rename_all = "camelCase")]
+pub(crate) struct ChatHistorySecuritySettings {
+    pub(crate) encrypted: bool,
+    pub(crate) salt: Option<String>,
+    pub(crate) password_verifier: Option<String>,
+}
+
 #[derive(Default, Deserialize, Serialize)]
 pub(crate) struct LauncherSettings {
     pub(crate) ollama_path: Option<String>,
     pub(crate) open_webui_path: Option<String>,
+    #[serde(default)]
+    pub(crate) installation_prompt_disabled: bool,
+    #[serde(default)]
+    pub(crate) chat_history_security: ChatHistorySecuritySettings,
+    #[serde(default)]
+    pub(crate) developer_agent: DeveloperAgentSettings,
+    #[serde(default)]
+    pub(crate) web_search: WebSearchSettings,
 }
 
 pub(crate) fn emit_runtime_log(app: &AppHandle, message: impl Into<String>) {
@@ -62,6 +121,7 @@ pub(crate) fn command_output_with_timeout(
     description: &str,
 ) -> Result<Output, String> {
     let mut child = command
+        .stdin(Stdio::null())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
@@ -95,6 +155,125 @@ pub(crate) fn hide_command_window(command: &mut Command) {
 
 #[cfg(not(target_os = "windows"))]
 pub(crate) fn hide_command_window(_command: &mut Command) {}
+
+pub(crate) fn command_available(program: &str) -> bool {
+    #[cfg(target_os = "windows")]
+    let command = {
+        let mut command = Command::new("where");
+        command.arg(program);
+        hide_command_window(&mut command);
+        command
+    };
+
+    #[cfg(not(target_os = "windows"))]
+    let command = {
+        let mut command = Command::new("sh");
+        command.args([
+            "-c",
+            "command -v \"$1\" >/dev/null 2>&1",
+            "assistia",
+            program,
+        ]);
+        hide_command_window(&mut command);
+        command
+    };
+
+    command_output_with_timeout(command, Duration::from_secs(3), program)
+        .map(|output| output.status.success())
+        .unwrap_or(false)
+}
+
+#[cfg(target_os = "linux")]
+fn curl_install_command() -> Option<Command> {
+    let mut command = Command::new("sh");
+    command.arg("-c").arg(
+        r#"
+set -e
+
+if command -v apt-get >/dev/null 2>&1; then
+  install_command='apt-get update && apt-get install -y curl'
+elif command -v dnf >/dev/null 2>&1; then
+  install_command='dnf install -y curl'
+elif command -v yum >/dev/null 2>&1; then
+  install_command='yum install -y curl'
+elif command -v zypper >/dev/null 2>&1; then
+  install_command='zypper --non-interactive install curl'
+elif command -v pacman >/dev/null 2>&1; then
+  install_command='pacman -Sy --noconfirm curl'
+elif command -v apk >/dev/null 2>&1; then
+  install_command='apk add --no-cache curl'
+else
+  echo "Aucun gestionnaire de paquets compatible n'a été trouvé pour installer curl." >&2
+  exit 127
+fi
+
+if [ "$(id -u)" = "0" ]; then
+  sh -c "$install_command"
+elif command -v pkexec >/dev/null 2>&1; then
+  pkexec sh -c "$install_command"
+elif command -v sudo >/dev/null 2>&1; then
+  sudo -n sh -c "$install_command"
+else
+  echo "curl est absent et aucun outil d'élévation de privilèges compatible n'a été trouvé." >&2
+  exit 127
+fi
+"#,
+    );
+    hide_command_window(&mut command);
+    Some(command)
+}
+
+#[cfg(target_os = "macos")]
+fn curl_install_command() -> Option<Command> {
+    if !command_available("brew") {
+        return None;
+    }
+
+    let mut command = Command::new("brew");
+    command.args(["install", "curl"]);
+    hide_command_window(&mut command);
+    Some(command)
+}
+
+#[cfg(target_os = "windows")]
+fn curl_install_command() -> Option<Command> {
+    None
+}
+
+#[cfg(not(any(target_os = "windows", target_os = "linux", target_os = "macos")))]
+fn curl_install_command() -> Option<Command> {
+    None
+}
+
+pub(crate) fn ensure_curl(app: &AppHandle) -> Result<(), String> {
+    if command_available("curl") {
+        return Ok(());
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        return Ok(());
+    }
+
+    emit_runtime_status(app, "Installation de curl...", 12);
+    emit_runtime_log(app, "curl est introuvable. Assistia tente de l'installer.");
+
+    let Some(command) = curl_install_command() else {
+        return Err(
+            "curl est introuvable et Assistia ne sait pas l'installer automatiquement sur ce système."
+                .to_string(),
+        );
+    };
+
+    run_streaming_command(app, command, "curl-install", "Installation de curl")?;
+
+    if command_available("curl") {
+        emit_runtime_log(app, "curl est installé.");
+        return Ok(());
+    }
+
+    Err("curl reste introuvable après la tentative d'installation.".to_string())
+}
 
 pub(crate) fn launcher_settings_path(app: &AppHandle) -> Result<PathBuf, String> {
     let config_dir = app.path().app_config_dir().map_err(|e| e.to_string())?;

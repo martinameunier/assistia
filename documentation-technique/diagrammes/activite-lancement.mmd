@@ -1,0 +1,22 @@
+flowchart TD
+  Start([Ouverture Assistia]) --> Mount["main.tsx monte App"]
+  Mount --> Status["useServiceStatus charge les statuts"]
+  Status --> Missing{"Aucun composant installé ?"}
+  Missing -- Oui --> Dialog["MissingComponentsDialog propose l'installation"]
+  Dialog --> Install["start_full_installation"]
+  Install --> RefreshAfterInstall["Rafraîchir les statuts"]
+  Missing -- Non --> AutoStart{"Serveurs installés mais arrêtés ?"}
+  RefreshAfterInstall --> AutoStart
+  AutoStart -- Ollama --> StartOllama["start_runtime puis ensure_ollama_server"]
+  AutoStart -- ComfyUI --> StartComfy["start_comfyui puis ensure_comfyui_installed"]
+  AutoStart -- SearXNG --> StartSearxng["start_searxng puis ensure_searxng_installed"]
+  AutoStart -- Aucun --> Ready["Application prête"]
+  StartOllama --> Events["launcher-status et launcher-log"]
+  StartComfy --> Events
+  StartSearxng --> Events
+  Events --> Refresh["refreshServices"]
+  Refresh --> Ready
+  Ready --> Chat["Page Chat disponible si Ollama répond"]
+  Ready --> Image["Page Image disponible si ComfyUI répond et modèle téléchargé"]
+  Ready --> WebSearch["Recherche web disponible si SearXNG répond"]
+  Ready --> Agent["Agent développeur disponible si configuré"]

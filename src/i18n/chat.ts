@@ -1,0 +1,100 @@
+export const chatTranslations = {
+  fr: {
+    pages: {
+      chat: {
+        kicker: "Conversation locale",
+        title: "Chat",
+        subtitle: "Discussion directe avec les modèles Ollama installés.",
+        statusReady: "Ollama démarré",
+        statusStopped: "Ollama arrêté",
+        statusMissing: "Ollama non installé",
+        modelLabel: "Modèle",
+        modelsLoading: "Vérification des modèles...",
+        noModelAvailable: "Aucun modèle disponible",
+        installAction: "Installer Ollama",
+        installingAction: "Installation d'Ollama...",
+        installStarted: "Ollama est installé.",
+        installError: "Impossible d'installer Ollama.",
+        conversationsTitle: "Conversations",
+        conversationsLoading: "Chargement des conversations...",
+        conversationsEmpty: "Aucune conversation enregistrée.",
+        newConversation: "Nouvelle conversation",
+        deleteConversation: "Supprimer la conversation",
+        conversationError: "Impossible de mettre à jour l'historique.",
+        messagePlaceholder: "Écrire un message...",
+        send: "Envoyer",
+        welcomeMessage: "Sélectionnez un modèle installé, puis envoyez votre message.",
+        processingMessage: "Le modèle traite votre demande...",
+        searchingWebMessage: "Recherche web en cours...",
+        missingModelMessage: "Téléchargez un modèle de chat depuis les paramètres avant de démarrer une conversation.",
+        ollamaStoppedMessage: "Ollama doit être démarré pour utiliser le chat.",
+        errorMessage: "Le chat n'a pas pu répondre.",
+        responseLanguageInstruction: "Sauf demande contraire explicite de l'utilisateur, réponds toujours en français, qui est la langue sélectionnée dans l'interface.",
+        webSearchEnabled: "Recherche web disponible",
+        webSearchDisabled: "Recherche web indisponible",
+        webSearchToggleOff: "Utiliser la recherche web pour le prochain message",
+        webSearchToggleOn: "Recherche web demandée pour le prochain message",
+        webSearchToggleUnavailable: "Activez la recherche web dans les paramètres pour l'utiliser dans le chat.",
+        webSearchInstruction: "Tu disposes de résultats de recherche web récents. Utilise-les uniquement s'ils sont pertinents, cite les sources par numéro quand tu t'en sers, et indique clairement quand les résultats ne suffisent pas.",
+        webSearchContextTitle: "Résultats de recherche web disponibles :",
+        webSearchNoResults: "Aucun résultat web exploitable n'a été trouvé.",
+        webSearchSourcesTitle: "Sources web consultées :"
+      }
+    },
+    runtime: {
+      ollamaModelDelete: "Suppression du modèle Ollama...",
+      ollamaModelDeleted: "Modèle Ollama supprimé.",
+      ollamaModelDownload: "Téléchargement du modèle Ollama...",
+      ollamaModelReady: "Modèle Ollama prêt."
+    }
+  },
+  en: {
+    pages: {
+      chat: {
+        kicker: "Local conversation",
+        title: "Chat",
+        subtitle: "Direct conversation with installed Ollama models.",
+        statusReady: "Ollama running",
+        statusStopped: "Ollama stopped",
+        statusMissing: "Ollama not installed",
+        modelLabel: "Model",
+        modelsLoading: "Checking models...",
+        noModelAvailable: "No model available",
+        installAction: "Install Ollama",
+        installingAction: "Installing Ollama...",
+        installStarted: "Ollama is installed.",
+        installError: "Unable to install Ollama.",
+        conversationsTitle: "Conversations",
+        conversationsLoading: "Loading conversations...",
+        conversationsEmpty: "No saved conversation.",
+        newConversation: "New conversation",
+        deleteConversation: "Delete conversation",
+        conversationError: "Unable to update history.",
+        messagePlaceholder: "Write a message...",
+        send: "Send",
+        welcomeMessage: "Select an installed model, then send your message.",
+        processingMessage: "The model is working on your request...",
+        searchingWebMessage: "Searching the web...",
+        missingModelMessage: "Download a chat model from settings before starting a conversation.",
+        ollamaStoppedMessage: "Ollama must be running to use chat.",
+        errorMessage: "The chat could not answer.",
+        responseLanguageInstruction: "Unless the user explicitly asks otherwise, always answer in English, which is the language selected in the interface.",
+        webSearchEnabled: "Web search available",
+        webSearchDisabled: "Web search unavailable",
+        webSearchToggleOff: "Use web search for the next message",
+        webSearchToggleOn: "Web search requested for the next message",
+        webSearchToggleUnavailable: "Enable web search in settings to use it in chat.",
+        webSearchInstruction: "You have recent web search results. Use them only if relevant, cite sources by number when you rely on them, and clearly say when the results are insufficient.",
+        webSearchContextTitle: "Available web search results:",
+        webSearchNoResults: "No usable web result was found.",
+        webSearchSourcesTitle: "Web sources checked:"
+      }
+    },
+    runtime: {
+      ollamaModelDelete: "Deleting Ollama model...",
+      ollamaModelDeleted: "Ollama model deleted.",
+      ollamaModelDownload: "Downloading Ollama model...",
+      ollamaModelReady: "Ollama model ready."
+    }
+  }
+} as const;

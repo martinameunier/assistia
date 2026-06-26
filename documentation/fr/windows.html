@@ -14,7 +14,10 @@
       </header>
 
       <section class="hero">
-        <h1>Installer Ollama et Open WebUI sur Windows</h1>
+        <h1 class="title-with-icon">
+          <span class="doc-icon icon-download" aria-hidden="true"></span>
+          <span>Installer Assistia et ses composants IA sur Windows</span>
+        </h1>
         <p>
           Assistia installe et lance les composants IA localement sur votre PC.
         </p>
@@ -27,11 +30,11 @@
             <li>Ouvrez Assistia.</li>
             <li>Cliquez sur <strong>Paramétrage</strong> en bas à droite.</li>
             <li>Cliquez sur <strong>Installer les composants manquants</strong>.</li>
-            <li>Assistia vérifie Ollama et Open WebUI, puis installe uniquement ce qui manque.</li>
+            <li>Assistia vérifie Ollama, ComfyUI et l'agent développeur, puis installe uniquement ce qui manque.</li>
           </ol>
 
           <p class="note">
-            L'installation d'Open WebUI prépare un environnement Python 3.11 local. Si Python 3.11 est absent, Assistia installe <code>uv</code>, puis récupère la bonne version de Python.
+            ComfyUI et l'agent développeur sont installés dans les données locales d'Assistia avec des environnements Python dédiés. Si une version de Python manque, Assistia installe <code>uv</code>, puis récupère la bonne version.
           </p>
         </section>
 
@@ -59,29 +62,27 @@
         </section>
 
         <section class="panel">
-          <h2>3. Open WebUI</h2>
+          <h2>3. ComfyUI et agent développeur</h2>
           <p>
-            Dans la plupart des cas, laissez <strong>Chemin vers Open WebUI</strong> vide. Assistia utilisera son installation locale gérée.
+            Dans la plupart des cas, aucune configuration système supplémentaire n'est nécessaire. Assistia installe ComfyUI et Aider dans ses propres dossiers applicatifs.
           </p>
           <p>
-            Si vous avez installé Open WebUI vous-même, vous pouvez renseigner un chemin comme :
+            Après installation, téléchargez les modèles depuis <strong>Paramètres</strong> : modèles Ollama pour le chat et modèles ComfyUI pour la génération d'image.
           </p>
-          <code class="command">C:\Users\vous\AppData\Roaming\Python\Scripts\open-webui.exe
-C:\Users\vous\AppData\Local\Programs\Python\Python311\Scripts\open-webui.exe</code>
         </section>
 
         <section class="panel">
           <h2>4. Démarrage</h2>
           <ol>
-            <li>Cliquez sur <strong>Démarrer</strong>.</li>
-            <li>Assistia lance Ollama sur <code>127.0.0.1:11434</code>.</li>
-            <li>Assistia lance Open WebUI sur <code>127.0.0.1:8080</code>.</li>
-            <li>Cliquez sur <strong>Ouvrir Open WebUI</strong> pour accéder à l'interface.</li>
+            <li>Ouvrez Assistia.</li>
+            <li>Assistia lance Ollama sur <code>127.0.0.1:11434</code> quand le composant est installé mais arrêté.</li>
+            <li>Si ComfyUI est installé, Assistia tente aussi de démarrer son serveur sur <code>127.0.0.1:8188</code>.</li>
+            <li>Utilisez l'onglet <strong>Chat</strong> pour discuter et l'onglet <strong>Générateur d'image</strong> pour créer des images.</li>
           </ol>
         </section>
 
         <p class="sources">
-          Sources principales : Ollama, Open WebUI et uv.
+          Sources principales : Ollama, ComfyUI, Aider et uv.
         </p>
       </div>
     </main>

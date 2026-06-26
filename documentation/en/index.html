@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Assistia Documentation</title>
+    <title>Assistia Documentation - Table of contents</title>
     <link rel="stylesheet" href="../style.css">
   </head>
   <body>
@@ -14,163 +14,35 @@
       </header>
 
       <section class="hero">
-        <h1>Installation and user documentation</h1>
+        <h1 class="title-with-icon">
+          <span class="doc-icon icon-book" aria-hidden="true"></span>
+          <span>The Assistia user book</span>
+        </h1>
         <p>
-          Assistia installs and starts a local AI environment with Ollama and Open WebUI directly on your computer.
+          Each chapter explains one tab of the application in simple words,
+          so you can use Assistia without technical knowledge.
         </p>
       </section>
 
-      <div class="content">
-        <details class="panel">
-          <summary>
-            <h2>1. Understanding the tools used</h2>
-          </summary>
-          <p>
-            Assistia brings together several tools so you can chat with artificial intelligence models from a local web interface.
-          </p>
+      <section class="book-cover" aria-labelledby="toc-title">
+        <div class="book-cover__intro">
+          <h2 id="toc-title">Table of contents</h2>
+          <p>Read the chapters in order, or open the tab that matches what you need.</p>
+        </div>
 
-          <h3>Ollama</h3>
-          <p>
-            Ollama downloads and runs AI models on your machine. Assistia starts its local API on <code>127.0.0.1:11434</code> and prepares the <code>qwen3:4b</code> model.
-          </p>
-
-          <h3>Open WebUI</h3>
-          <p>
-            Open WebUI is the chat interface displayed in your browser. Assistia starts it on <code>127.0.0.1:8080</code> and connects it to Ollama.
-          </p>
-
-          <h3>Python 3.11 and uv</h3>
-          <p>
-            Open WebUI runs in a local Python environment managed by Assistia. If Python 3.11 is not available, Assistia installs <code>uv</code>, fetches Python 3.11, then installs Open WebUI in that environment.
-          </p>
-
-          <p class="note">
-            In short: Ollama runs the models, Open WebUI provides the interface, and Assistia installs and starts the required components.
-          </p>
-        </details>
-
-        <details class="panel">
-          <summary>
-            <h2>2. Install missing components</h2>
-          </summary>
-          <p>
-            In Assistia, open <strong>Settings</strong>, then click <strong>Install missing components</strong>. The application first checks what is already present before launching any installation.
-          </p>
-
-          <ul>
-            <li>If Ollama is already installed, its installation is skipped.</li>
-            <li>If Open WebUI is already installed, its installation is skipped.</li>
-            <li>If a component is missing, Assistia installs only that component.</li>
-          </ul>
-
-          <p class="note">
-            Ollama and Open WebUI remain third-party software subject to their own licenses and terms of use.
-          </p>
-
-          <nav class="os-grid" aria-label="Operating system selection">
-            <a class="os-button" href="macos.html">
-              <strong>macOS</strong>
-              <span>Local installation</span>
-            </a>
-            <a class="os-button" href="windows.html">
-              <strong>Windows</strong>
-              <span>Local installation</span>
-            </a>
-            <a class="os-button" href="linux.html">
-              <strong>Linux</strong>
-              <span>Local installation</span>
-            </a>
-          </nav>
-        </details>
-
-        <details class="panel">
-          <summary>
-            <h2>3. Settings in Assistia</h2>
-          </summary>
-
-          <p>
-            The <strong>Settings</strong> button is located at the bottom right of the window. It lets you configure executable paths and install missing components.
-          </p>
-
-          <h3>Ollama path</h3>
-          <p>
-            Leave this field empty to use automatic detection. You can also enter the full path to the Ollama executable or to the folder that contains it.
-          </p>
-
-          <div class="path-examples">
-            <strong>Examples</strong>
-            <ul>
-              <li><span>Windows</span><code>C:\Users\you\AppData\Local\Programs\Ollama\ollama.exe</code></li>
-              <li><span>macOS</span><code>/usr/local/bin/ollama</code></li>
-              <li><span>Linux</span><code>/usr/bin/ollama</code></li>
-            </ul>
-          </div>
-
-          <h3>Open WebUI path</h3>
-          <p>
-            Leave this field empty to use Assistia's managed local installation. You can also provide a manually installed Open WebUI executable.
-          </p>
-
-          <div class="path-examples">
-            <strong>Examples</strong>
-            <ul>
-              <li><span>Windows</span><code>C:\Users\you\AppData\Roaming\Python\Scripts\open-webui.exe</code></li>
-              <li><span>macOS</span><code>/usr/local/bin/open-webui</code></li>
-              <li><span>Linux</span><code>/usr/local/bin/open-webui</code></li>
-            </ul>
-          </div>
-        </details>
-
-        <details class="panel">
-          <summary>
-            <h2>4. Start and use Open WebUI</h2>
-          </summary>
-
-          <h3>Start services</h3>
-          <ol>
-            <li>Make sure missing components have been installed from the Settings menu.</li>
-            <li>Click <strong>Start</strong>.</li>
-            <li>Assistia starts Ollama, prepares the <code>qwen3:4b</code> model, then launches Open WebUI.</li>
-            <li>When Open WebUI is available, click <strong>Open WebUI</strong>.</li>
-          </ol>
-
-          <p class="note">
-            If Open WebUI displays an error on first launch, wait a few minutes and refresh the page. Model download or service initialization can take some time.
-          </p>
-
-          <h3>Add a new model</h3>
-          <ol>
-            <li>In Open WebUI, open the model selector or the administration settings depending on your user profile.</li>
-            <li>Search for an Ollama-compatible model, for example <code>llama3.2</code> or <code>mistral</code>. <a class="home-link" href="models.html">See the model table</a></li>
-            <li>Start downloading the model.</li>
-            <li>Wait for the installation to finish before starting a conversation.</li>
-          </ol>
-
-          <img src="../images/ajout_modele.png" width="100%" alt="Adding a model in Open WebUI">
-
-          <h3>Customize a model with a system prompt</h3>
-          <ol>
-            <li>In Open WebUI, go to Workspace.</li>
-            <li>Click + New Model.</li>
-            <li>Enter a model name, for example: My custom AI assistant.</li>
-            <li>Select an available base model.</li>
-            <li>Add a system prompt to customize your model.</li>
-            <li>Save the configuration, then select this custom model in a new conversation.</li>
-          </ol>
-
-          <img src="../images/exemples-modele-personnalise.png" width="100%" alt="Custom model example in Open WebUI">
-        </details>
-
-        <details class="panel">
-          <summary>
-            <h2>5. Support the project</h2>
-          </summary>
-          <p>
-            The <strong>Patreon</strong> button at the bottom left of the application opens the project support page:
-            <a href="https://www.patreon.com/c/MartinAMeunier">patreon.com/c/MartinAMeunier</a>.
-          </p>
-        </details>
-      </div>
+        <nav class="book-toc" aria-label="Documentation table of contents">
+          <a href="getting-started.html"><span class="book-toc__number"><span class="doc-icon icon-download" aria-hidden="true"></span>Chapter 1</span><span><strong>Getting started and installation</strong>Understand Assistia, the menu, first setup, and components.</span></a>
+          <a href="chat.html"><span class="book-toc__number"><span class="doc-icon icon-chat" aria-hidden="true"></span>Chapter 2</span><span><strong>Chat tab</strong>Talk with a local AI, choose a model, use web search, and manage conversations.</span></a>
+          <a href="image-generator.html"><span class="book-toc__number"><span class="doc-icon icon-image" aria-hidden="true"></span>Chapter 3</span><span><strong>Image generator tab</strong>Create an image, choose a model, start generation, and save the result.</span></a>
+          <a href="developer-agent.html"><span class="book-toc__number"><span class="doc-icon icon-code" aria-hidden="true"></span>Chapter 4</span><span><strong>Developer agent tab</strong>Understand the development assistant and precautions before modifying a project.</span></a>
+          <a href="settings.html"><span class="book-toc__number"><span class="doc-icon icon-settings" aria-hidden="true"></span>Chapter 5</span><span><strong>Settings tab</strong>Install components, download models, and configure the application.</span></a>
+          <a href="logs-license.html"><span class="book-toc__number"><span class="doc-icon icon-logs" aria-hidden="true"></span>Chapter 6</span><span><strong>Logs, license, and help</strong>Read logs, review licenses, open documentation, and support the project.</span></a>
+          <a href="models.html"><span class="book-toc__number"><span class="doc-icon icon-chat" aria-hidden="true"></span>Appendix</span><span><strong>Choose an Ollama model</strong>Table to help choose a model for your computer.</span></a>
+          <a href="macos.html"><span class="book-toc__number"><span class="doc-icon icon-download" aria-hidden="true"></span>Appendix</span><span><strong>macOS installation</strong>Specific help for installing and using Assistia on macOS.</span></a>
+          <a href="windows.html"><span class="book-toc__number"><span class="doc-icon icon-download" aria-hidden="true"></span>Appendix</span><span><strong>Windows installation</strong>Specific help for installing and using Assistia on Windows.</span></a>
+          <a href="linux.html"><span class="book-toc__number"><span class="doc-icon icon-download" aria-hidden="true"></span>Appendix</span><span><strong>Linux installation</strong>Specific help for installing and using Assistia on Linux.</span></a>
+        </nav>
+      </section>
     </main>
   </body>
 </html>

@@ -1,0 +1,891 @@
+[
+  {
+    "name": "SDXL Base 1.0",
+    "description": "Modele SDXL polyvalent pour des images detaillees en 1024px.",
+    "architecture": "Stable Diffusion XL",
+    "recommendedMemory": "GPU 8 Go+ conseille",
+    "tags": [
+      "checkpoint",
+      "1024px",
+      "base"
+    ],
+    "license": {
+      "name": "CreativeML Open RAIL++-M",
+      "url": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/blob/main/LICENSE.md",
+      "summary": "Licence OpenRAIL++ autorisant l'utilisation locale du modele sous conditions d'usage responsable.",
+      "usage": "Creation artistique, design, recherche et usages creatifs locaux, sous reserve du respect de la licence.",
+      "restrictions": [
+        "Interdit les usages illegaux, dangereux, discriminatoires ou trompeurs.",
+        "L'utilisateur reste responsable des contenus generes et des droits des tiers.",
+        "La redistribution ou l'integration doit conserver les conditions de licence applicables."
+      ]
+    },
+    "workflowPath": "workflows/sdxl-base.json",
+    "promptAttributeName": "6.inputs.text",
+    "downloads": [
+      {
+        "url": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors",
+        "destinationDirectory": "checkpoints",
+        "fileName": "sd_xl_base_1.0.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "SDXL Turbo",
+    "description": "Modele SDXL optimise pour generer vite avec peu d'etapes en 512px.",
+    "architecture": "Stable Diffusion XL Turbo",
+    "recommendedMemory": "GPU 6 Go+ conseille",
+    "tags": [
+      "checkpoint",
+      "rapide",
+      "512px"
+    ],
+    "license": {
+      "name": "Stability AI Non-Commercial Community License",
+      "url": "https://huggingface.co/stabilityai/sdxl-turbo/blob/main/LICENSE.md",
+      "summary": "Licence communautaire Stability AI avec conditions specifiques, notamment autour des usages commerciaux.",
+      "usage": "Usage local, tests, recherche et experimentation. Verifiez les conditions Stability AI avant tout usage commercial.",
+      "restrictions": [
+        "Les usages commerciaux peuvent necessiter une licence ou une adhesion Stability AI.",
+        "Les conditions d'utilisation acceptable de Stability AI s'appliquent.",
+        "Le modele est prevu pour une utilisation responsable et conforme aux lois applicables."
+      ]
+    },
+    "workflowPath": "workflows/sdxl-turbo.json",
+    "promptAttributeName": "6.inputs.text",
+    "downloads": [
+      {
+        "url": "https://huggingface.co/stabilityai/sdxl-turbo/resolve/main/sd_xl_turbo_1.0_fp16.safetensors",
+        "destinationDirectory": "checkpoints",
+        "fileName": "sd_xl_turbo_1.0_fp16.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "FLUX.1 Schnell FP8",
+    "description": "Checkpoint Flux rapide et all-in-one pour ComfyUI, optimise pour une generation en 4 etapes.",
+    "architecture": "Flux",
+    "recommendedMemory": "GPU 12 Go+ conseille, 16 Go+ plus confortable",
+    "tags": [
+      "checkpoint",
+      "fp8",
+      "rapide",
+      "1024px"
+    ],
+    "notes": [
+      "Variante FP8 plus legere que les poids Flux complets.",
+      "Les prompts longs fonctionnent mieux avec Flux, mais les generations restent plus lentes que SDXL Turbo."
+    ],
+    "license": {
+      "name": "Apache License 2.0",
+      "url": "https://huggingface.co/Comfy-Org/flux1-schnell",
+      "summary": "Licence permissive Apache 2.0 pour la variante Schnell, avec utilisation personnelle, scientifique et commerciale autorisee.",
+      "usage": "Generation locale rapide avec ComfyUI, y compris pour des usages commerciaux, en respectant les obligations Apache 2.0.",
+      "restrictions": [
+        "Conserver les mentions de copyright, notices et clauses de licence.",
+        "Ne pas utiliser le modele pour des contenus illegaux, nuisibles, trompeurs ou portant atteinte aux droits d'autrui.",
+        "Aucune garantie n'est fournie par les auteurs ou distributeurs du modele."
+      ]
+    },
+    "workflowPath": "workflows/flux1-schnell-fp8.json",
+    "promptAttributeName": "6.inputs.text",
+    "downloads": [
+      {
+        "url": "https://huggingface.co/Comfy-Org/flux1-schnell/resolve/main/flux1-schnell-fp8.safetensors",
+        "destinationDirectory": "checkpoints",
+        "fileName": "flux1-schnell-fp8.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "FLUX.1 Dev FP8",
+    "description": "Checkpoint Flux Dev FP8 pour ComfyUI, plus qualitatif que Schnell mais reserve aux usages autorises par sa licence non commerciale.",
+    "architecture": "Flux",
+    "recommendedMemory": "GPU 12 Go+ conseille, 16 Go+ plus confortable",
+    "tags": [
+      "checkpoint",
+      "fp8",
+      "non-commercial",
+      "1024px"
+    ],
+    "notes": [
+      "Version FP8 all-in-one avec encodeurs texte integres dans le checkpoint ComfyUI.",
+      "Reglage CFG 1.0 recommande pour les checkpoints Flux FP8."
+    ],
+    "license": {
+      "name": "FLUX.1 [dev] Non-Commercial License",
+      "url": "https://huggingface.co/Comfy-Org/flux1-dev",
+      "summary": "Licence non commerciale pour Flux Dev. Elle permet l'experimentation locale mais limite les usages commerciaux.",
+      "usage": "Usage local, recherche, tests et creation non commerciale, sous reserve du respect de la licence Flux Dev.",
+      "restrictions": [
+        "Usage commercial non autorise sans licence adaptee.",
+        "Respecter les restrictions de la licence Black Forest Labs Flux Dev.",
+        "L'utilisateur reste responsable des contenus generes et du respect des droits de tiers."
+      ]
+    },
+    "workflowPath": "workflows/flux1-dev-fp8.json",
+    "promptAttributeName": "6.inputs.text",
+    "downloads": [
+      {
+        "url": "https://huggingface.co/Comfy-Org/flux1-dev/resolve/main/flux1-dev-fp8.safetensors",
+        "destinationDirectory": "checkpoints",
+        "fileName": "flux1-dev-fp8.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "Segmind SSD-1B",
+    "description": "Checkpoint SDXL plus leger, compatible ComfyUI, sous licence Apache 2.0.",
+    "architecture": "Stable Diffusion XL",
+    "recommendedMemory": "GPU 6 Go+ conseille",
+    "tags": [
+      "checkpoint",
+      "leger",
+      "1024px"
+    ],
+    "license": {
+      "name": "Apache License 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0",
+      "summary": "Licence permissive autorisant l'utilisation, la modification et la redistribution sous conditions de notice.",
+      "usage": "Utilisation locale, personnelle, professionnelle ou commerciale autorisee en respectant les obligations Apache 2.0.",
+      "restrictions": [
+        "Conserver les mentions de copyright, notices et clauses de licence.",
+        "Inclure les modifications significatives quand le modele est redistribue.",
+        "Aucune garantie n'est fournie par les auteurs du modele."
+      ]
+    },
+    "workflowPath": "workflows/ssd-1b.json",
+    "promptAttributeName": "6.inputs.text",
+    "downloads": [
+      {
+        "url": "https://huggingface.co/segmind/SSD-1B/resolve/main/SSD-1B-A1111.safetensors",
+        "destinationDirectory": "checkpoints",
+        "fileName": "SSD-1B-A1111.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "Stable Diffusion 3.5 Medium FP8",
+    "description": "Checkpoint SD3.5 Medium tout-en-un pour ComfyUI, avec encodeurs texte integres et latent SD3 dedie.",
+    "architecture": "Stable Diffusion 3.5",
+    "recommendedMemory": "GPU 12 Go+ conseille, 16 Go+ plus confortable",
+    "tags": [
+      "checkpoint",
+      "fp8",
+      "sd3",
+      "1024px"
+    ],
+    "notes": [
+      "Checkpoint tout-en-un : aucun encodeur texte supplementaire n'est requis.",
+      "Le workflow utilise EmptySD3LatentImage, requis par SD3/SD3.5."
+    ],
+    "license": {
+      "name": "Stability AI Community License",
+      "url": "https://huggingface.co/Comfy-Org/stable-diffusion-3.5-fp8",
+      "summary": "Licence communautaire Stability AI autorisant l'utilisation sous conditions, avec limites pour certains usages commerciaux.",
+      "usage": "Generation locale, experimentation, creation et integrations compatibles avec les conditions Stability AI Community License.",
+      "restrictions": [
+        "Respecter la politique d'utilisation acceptable de Stability AI.",
+        "Verifier les conditions de licence avant tout usage commercial a grande echelle.",
+        "L'utilisateur reste responsable des contenus generes et du respect des droits de tiers."
+      ]
+    },
+    "workflowTemplate": "checkpoint",
+    "workflow": {
+      "checkpointName": "sd3.5_medium_incl_clips_t5xxlfp8scaled.safetensors",
+      "cfg": 5.45,
+      "height": 1024,
+      "latentNodeClass": "EmptySD3LatentImage",
+      "negativePrompt": "",
+      "samplerName": "euler",
+      "scheduler": "sgm_uniform",
+      "steps": 30,
+      "width": 1024,
+      "filenamePrefix": "assistia-sd3-5-medium"
+    },
+    "downloads": [
+      {
+        "url": "https://huggingface.co/Comfy-Org/stable-diffusion-3.5-fp8/resolve/main/sd3.5_medium_incl_clips_t5xxlfp8scaled.safetensors",
+        "destinationDirectory": "checkpoints",
+        "fileName": "sd3.5_medium_incl_clips_t5xxlfp8scaled.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "Stable Diffusion 3.5 Large FP8",
+    "description": "Modele SD3.5 Large FP8 pour ComfyUI avec encodeurs texte separes CLIP-L, CLIP-G et T5.",
+    "architecture": "Stable Diffusion 3.5",
+    "recommendedMemory": "GPU 16 Go+ conseille, 24 Go+ plus confortable",
+    "tags": [
+      "multi-file",
+      "fp8",
+      "sd3",
+      "1024px"
+    ],
+    "notes": [
+      "Telecharge le checkpoint SD3.5 Large ainsi que les trois encodeurs texte necessaires.",
+      "Le workflow utilise TripleCLIPLoader et EmptySD3LatentImage."
+    ],
+    "license": {
+      "name": "Stability AI Community License",
+      "url": "https://huggingface.co/Comfy-Org/stable-diffusion-3.5-fp8",
+      "summary": "Licence communautaire Stability AI autorisant l'utilisation sous conditions, avec limites pour certains usages commerciaux.",
+      "usage": "Generation locale, experimentation, creation et integrations compatibles avec les conditions Stability AI Community License.",
+      "restrictions": [
+        "Respecter la politique d'utilisation acceptable de Stability AI.",
+        "Verifier les conditions de licence avant tout usage commercial a grande echelle.",
+        "L'utilisateur reste responsable des contenus generes et du respect des droits de tiers."
+      ]
+    },
+    "workflowTemplate": "sd3TripleClip",
+    "workflow": {
+      "checkpointName": "sd3.5_large_fp8_scaled.safetensors",
+      "clipGName": "clip_g.safetensors",
+      "clipLName": "clip_l.safetensors",
+      "t5Name": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "cfg": 5.45,
+      "height": 1024,
+      "negativePrompt": "",
+      "samplerName": "euler",
+      "scheduler": "sgm_uniform",
+      "steps": 30,
+      "width": 1024,
+      "filenamePrefix": "assistia-sd3-5-large"
+    },
+    "downloads": [
+      {
+        "url": "https://huggingface.co/Comfy-Org/stable-diffusion-3.5-fp8/resolve/main/sd3.5_large_fp8_scaled.safetensors",
+        "destinationDirectory": "checkpoints",
+        "fileName": "sd3.5_large_fp8_scaled.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/Comfy-Org/stable-diffusion-3.5-fp8/resolve/main/text_encoders/clip_l.safetensors",
+        "destinationDirectory": "text_encoders",
+        "fileName": "clip_l.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/Comfy-Org/stable-diffusion-3.5-fp8/resolve/main/text_encoders/clip_g.safetensors",
+        "destinationDirectory": "text_encoders",
+        "fileName": "clip_g.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/Comfy-Org/stable-diffusion-3.5-fp8/resolve/main/text_encoders/t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "destinationDirectory": "text_encoders",
+        "fileName": "t5xxl_fp8_e4m3fn_scaled.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "AuraFlow 0.2",
+    "description": "Modele flow-based open source distribue comme checkpoint ComfyUI local.",
+    "architecture": "AuraFlow",
+    "recommendedMemory": "GPU 16 Go+ conseille",
+    "tags": [
+      "checkpoint",
+      "apache-2.0",
+      "1024px"
+    ],
+    "notes": [
+      "Modele tres volumineux : le fichier pese environ 17,5 Go.",
+      "Necessite une version recente de ComfyUI avec support AuraFlow."
+    ],
+    "license": {
+      "name": "Apache License 2.0",
+      "url": "https://huggingface.co/fal/AuraFlow-v0.2",
+      "summary": "Licence permissive Apache 2.0 pour le code et les poids AuraFlow 0.2.",
+      "usage": "Utilisation locale, personnelle, professionnelle ou commerciale autorisee en respectant les obligations Apache 2.0.",
+      "restrictions": [
+        "Conserver les mentions de copyright, notices et clauses de licence.",
+        "Inclure les modifications significatives quand le modele est redistribue.",
+        "Aucune garantie n'est fournie par les auteurs du modele."
+      ]
+    },
+    "workflowTemplate": "checkpoint",
+    "workflow": {
+      "checkpointName": "aura_flow_0.2.safetensors",
+      "cfg": 3.48,
+      "height": 1024,
+      "negativePrompt": "ugly jpeg",
+      "samplerName": "euler",
+      "scheduler": "sgm_uniform",
+      "steps": 20,
+      "width": 1024,
+      "filenamePrefix": "assistia-auraflow"
+    },
+    "downloads": [
+      {
+        "url": "https://huggingface.co/fal/AuraFlow-v0.2/resolve/main/aura_flow_0.2.safetensors",
+        "destinationDirectory": "checkpoints",
+        "fileName": "aura_flow_0.2.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "HunyuanDiT 1.2",
+    "description": "Checkpoint HunyuanDiT converti pour ComfyUI, avec comprehension anglais/chinois.",
+    "architecture": "HunyuanDiT",
+    "recommendedMemory": "GPU 12 Go+ conseille",
+    "tags": [
+      "checkpoint",
+      "bilingue",
+      "experimental"
+    ],
+    "notes": [
+      "Depot ComfyUI fourni pour usage local avec le noeud Load Checkpoint.",
+      "La licence n'est pas declaree clairement sur le depot miroir ComfyUI : a verifier avant usage public ou commercial."
+    ],
+    "license": {
+      "name": "Licence non declaree sur le depot ComfyUI",
+      "url": "https://huggingface.co/comfyanonymous/hunyuan_dit_comfyui",
+      "summary": "Le depot ComfyUI fournit le checkpoint local mais n'affiche pas de licence explicite dans les metadonnees Hugging Face.",
+      "usage": "Usage local a verifier avec les conditions Tencent/Hunyuan d'origine avant redistribution, publication ou usage commercial.",
+      "restrictions": [
+        "Verifier la licence d'origine avant tout usage autre que des tests locaux.",
+        "Ne pas redistribuer le modele sans droits explicites.",
+        "L'utilisateur reste responsable des contenus generes et du respect des droits de tiers."
+      ]
+    },
+    "workflowTemplate": "checkpoint",
+    "workflow": {
+      "checkpointName": "hunyuan_dit_1.2.safetensors",
+      "cfg": 7,
+      "height": 1024,
+      "negativePrompt": "blurry, low quality, distorted",
+      "samplerName": "euler",
+      "scheduler": "normal",
+      "steps": 30,
+      "width": 1024,
+      "filenamePrefix": "assistia-hunyuan-dit"
+    },
+    "downloads": [
+      {
+        "url": "https://huggingface.co/comfyanonymous/hunyuan_dit_comfyui/resolve/main/hunyuan_dit_1.2.safetensors",
+        "destinationDirectory": "checkpoints",
+        "fileName": "hunyuan_dit_1.2.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "Stable Cascade",
+    "description": "Workflow Stable Cascade texte-vers-image en trois etapes, avec checkpoints Stage C et Stage B locaux.",
+    "architecture": "Stable Cascade",
+    "recommendedMemory": "GPU 12 Go+ conseille, 16 Go+ plus confortable",
+    "tags": [
+      "multi-stage",
+      "checkpoint",
+      "1024px"
+    ],
+    "notes": [
+      "Stable Cascade genere d'abord un latent Stage C, puis l'affine avec Stage B avant le decodage Stage A.",
+      "Les fichiers sont renommes localement pour correspondre aux workflows ComfyUI officiels."
+    ],
+    "license": {
+      "name": "Stable Cascade Non-Commercial Community License",
+      "url": "https://huggingface.co/stabilityai/stable-cascade",
+      "summary": "Licence communautaire non commerciale pour Stable Cascade.",
+      "usage": "Usage local, experimentation et recherche non commerciale, sous reserve des conditions Stability AI.",
+      "restrictions": [
+        "Usage commercial non autorise sans licence adaptee.",
+        "Respecter la politique d'utilisation acceptable de Stability AI.",
+        "Conserver les conditions de licence en cas de redistribution."
+      ]
+    },
+    "workflowTemplate": "stableCascade",
+    "workflow": {
+      "stageCCheckpointName": "stable_cascade_stage_c.safetensors",
+      "stageBCheckpointName": "stable_cascade_stage_b.safetensors",
+      "cfg": 4,
+      "height": 1024,
+      "negativePrompt": "text, watermark",
+      "samplerName": "euler_ancestral",
+      "scheduler": "simple",
+      "stageBCfg": 1.1,
+      "stageBSamplerName": "euler_ancestral",
+      "stageBScheduler": "simple",
+      "stageBSteps": 10,
+      "steps": 20,
+      "width": 1024,
+      "filenamePrefix": "assistia-stable-cascade"
+    },
+    "downloads": [
+      {
+        "url": "https://huggingface.co/stabilityai/stable-cascade/resolve/main/stage_c.safetensors",
+        "destinationDirectory": "checkpoints",
+        "fileName": "stable_cascade_stage_c.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/stabilityai/stable-cascade/resolve/main/stage_b.safetensors",
+        "destinationDirectory": "checkpoints",
+        "fileName": "stable_cascade_stage_b.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "Lumina Image 2.0",
+    "description": "Checkpoint Lumina Image 2.0 all-in-one repackaging ComfyUI.",
+    "architecture": "Lumina Image 2.0",
+    "recommendedMemory": "GPU 16 Go+ conseille",
+    "tags": [
+      "checkpoint",
+      "1024px",
+      "experimental"
+    ],
+    "notes": [
+      "Necessite une version recente de ComfyUI avec ModelSamplingAuraFlow.",
+      "Le prompt est prefixe comme dans le workflow officiel Lumina 2."
+    ],
+    "license": {
+      "name": "Licence non declaree sur le depot ComfyUI",
+      "url": "https://huggingface.co/Comfy-Org/Lumina_Image_2.0_Repackaged",
+      "summary": "Le depot ComfyUI repackaged ne declare pas de licence explicite dans les metadonnees Hugging Face.",
+      "usage": "Usage local a verifier avec les conditions Lumina Image 2.0 d'origine avant redistribution, publication ou usage commercial.",
+      "restrictions": [
+        "Verifier la licence d'origine avant tout usage autre que des tests locaux.",
+        "Ne pas redistribuer le modele sans droits explicites.",
+        "L'utilisateur reste responsable des contenus generes et du respect des droits de tiers."
+      ]
+    },
+    "workflowTemplate": "checkpoint",
+    "workflow": {
+      "checkpointName": "lumina_2.safetensors",
+      "cfg": 4,
+      "height": 1024,
+      "latentNodeClass": "EmptySD3LatentImage",
+      "modelSamplingClass": "ModelSamplingAuraFlow",
+      "modelSamplingShift": 6,
+      "negativePrompt": "blurry ugly bad",
+      "promptPrefix": "You are an assistant designed to generate superior images with the superior degree of image-text alignment based on textual prompts or user prompts. <Prompt Start> ",
+      "samplerName": "res_multistep",
+      "scheduler": "simple",
+      "steps": 25,
+      "width": 1024,
+      "filenamePrefix": "assistia-lumina-2"
+    },
+    "downloads": [
+      {
+        "url": "https://huggingface.co/Comfy-Org/Lumina_Image_2.0_Repackaged/resolve/main/all_in_one/lumina_2.safetensors",
+        "destinationDirectory": "checkpoints",
+        "fileName": "lumina_2.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "Chroma1-HD",
+    "description": "Modele Chroma local derive de Flux, avec T5 et VAE separes.",
+    "architecture": "Chroma",
+    "recommendedMemory": "GPU 16 Go+ conseille, 24 Go+ plus confortable",
+    "tags": [
+      "diffusion-model",
+      "t5",
+      "1024px"
+    ],
+    "notes": [
+      "Utilise le chargeur UNETLoader avec CLIPLoader type chroma et T5TokenizerOptions.",
+      "La variante T5 FP8 est selectionnee pour reduire la taille du telechargement."
+    ],
+    "license": {
+      "name": "Apache License 2.0",
+      "url": "https://huggingface.co/lodestones/Chroma",
+      "summary": "Licence permissive Apache 2.0 declaree sur le depot Chroma.",
+      "usage": "Utilisation locale, personnelle, professionnelle ou commerciale autorisee en respectant les obligations Apache 2.0.",
+      "restrictions": [
+        "Conserver les mentions de copyright, notices et clauses de licence.",
+        "Inclure les modifications significatives quand le modele est redistribue.",
+        "Aucune garantie n'est fournie par les auteurs du modele."
+      ]
+    },
+    "workflowTemplate": "unetClipVae",
+    "workflow": {
+      "diffusionModelName": "Chroma1-HD.safetensors",
+      "clipName": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "clipType": "chroma",
+      "vaeName": "ae.safetensors",
+      "cfg": 4,
+      "height": 1024,
+      "negativePrompt": "low quality, bad anatomy, extra digits, missing digits, extra limbs, missing limbs",
+      "samplerName": "euler",
+      "scheduler": "simple",
+      "steps": 30,
+      "useT5TokenizerOptions": true,
+      "tokenizerMinLength": 3,
+      "tokenizerMinPadding": 0,
+      "width": 1024,
+      "filenamePrefix": "assistia-chroma"
+    },
+    "downloads": [
+      {
+        "url": "https://huggingface.co/lodestones/Chroma1-HD/resolve/main/Chroma1-HD.safetensors",
+        "destinationDirectory": "diffusion_models",
+        "fileName": "Chroma1-HD.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn_scaled.safetensors",
+        "destinationDirectory": "text_encoders",
+        "fileName": "t5xxl_fp8_e4m3fn_scaled.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/vae/ae.safetensors",
+        "destinationDirectory": "vae",
+        "fileName": "ae.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "Qwen Image FP8",
+    "description": "Modele Qwen Image FP8 pour ComfyUI avec encodeur Qwen-VL et VAE separes.",
+    "architecture": "Qwen Image",
+    "recommendedMemory": "GPU 24 Go+ conseille",
+    "tags": [
+      "diffusion-model",
+      "fp8",
+      "1328px"
+    ],
+    "notes": [
+      "Le workflow utilise ModelSamplingAuraFlow avec le decalage recommande par l'exemple officiel.",
+      "Le modele reste volumineux meme en FP8."
+    ],
+    "license": {
+      "name": "Apache License 2.0",
+      "url": "https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI",
+      "summary": "Licence permissive Apache 2.0 declaree sur le depot ComfyUI Qwen Image.",
+      "usage": "Utilisation locale, personnelle, professionnelle ou commerciale autorisee en respectant les obligations Apache 2.0.",
+      "restrictions": [
+        "Conserver les mentions de copyright, notices et clauses de licence.",
+        "Inclure les modifications significatives quand le modele est redistribue.",
+        "Aucune garantie n'est fournie par les auteurs du modele."
+      ]
+    },
+    "workflowTemplate": "unetClipVae",
+    "workflow": {
+      "diffusionModelName": "qwen_image_fp8_e4m3fn.safetensors",
+      "clipName": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+      "clipType": "qwen_image",
+      "vaeName": "qwen_image_vae.safetensors",
+      "cfg": 2.5,
+      "height": 1328,
+      "modelSamplingClass": "ModelSamplingAuraFlow",
+      "modelSamplingShift": 3.1,
+      "negativePrompt": " ",
+      "samplerName": "euler",
+      "scheduler": "simple",
+      "steps": 20,
+      "width": 1328,
+      "filenamePrefix": "assistia-qwen-image"
+    },
+    "downloads": [
+      {
+        "url": "https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/diffusion_models/qwen_image_fp8_e4m3fn.safetensors",
+        "destinationDirectory": "diffusion_models",
+        "fileName": "qwen_image_fp8_e4m3fn.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors",
+        "destinationDirectory": "text_encoders",
+        "fileName": "qwen_2.5_vl_7b_fp8_scaled.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/vae/qwen_image_vae.safetensors",
+        "destinationDirectory": "vae",
+        "fileName": "qwen_image_vae.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "Z Image Turbo BF16",
+    "description": "Modele Z Image Turbo pour ComfyUI, optimise pour peu d'etapes.",
+    "architecture": "Z Image",
+    "recommendedMemory": "GPU 16 Go+ conseille",
+    "tags": [
+      "diffusion-model",
+      "turbo",
+      "1024px"
+    ],
+    "license": {
+      "name": "Licence non declaree sur le depot ComfyUI",
+      "url": "https://huggingface.co/Comfy-Org/z_image_turbo",
+      "summary": "Le depot ComfyUI z_image_turbo ne declare pas de licence explicite dans les metadonnees Hugging Face.",
+      "usage": "Usage local a verifier avec les conditions Z Image d'origine avant redistribution, publication ou usage commercial.",
+      "restrictions": [
+        "Verifier la licence d'origine avant tout usage autre que des tests locaux.",
+        "Ne pas redistribuer le modele sans droits explicites.",
+        "L'utilisateur reste responsable des contenus generes et du respect des droits de tiers."
+      ]
+    },
+    "workflowTemplate": "unetClipVae",
+    "workflow": {
+      "diffusionModelName": "z_image_turbo_bf16.safetensors",
+      "clipName": "qwen_3_4b.safetensors",
+      "clipType": "lumina2",
+      "vaeName": "ae.safetensors",
+      "cfg": 1,
+      "height": 1024,
+      "negativePrompt": "blurry ugly bad",
+      "samplerName": "euler",
+      "scheduler": "simple",
+      "steps": 9,
+      "width": 1024,
+      "filenamePrefix": "assistia-z-image"
+    },
+    "downloads": [
+      {
+        "url": "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/diffusion_models/z_image_turbo_bf16.safetensors",
+        "destinationDirectory": "diffusion_models",
+        "fileName": "z_image_turbo_bf16.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors",
+        "destinationDirectory": "text_encoders",
+        "fileName": "qwen_3_4b.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/vae/ae.safetensors",
+        "destinationDirectory": "vae",
+        "fileName": "ae.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "Hunyuan Image 2.1 FP8",
+    "description": "Modele Hunyuan Image 2.1 local avec deux encodeurs texte et VAE separe.",
+    "architecture": "Hunyuan Image",
+    "recommendedMemory": "GPU 24 Go+ conseille",
+    "tags": [
+      "diffusion-model",
+      "dual-clip",
+      "2048px"
+    ],
+    "notes": [
+      "Modele tres volumineux, concu pour de grandes resolutions.",
+      "Utilise DualCLIPLoader avec le type hunyuan_image."
+    ],
+    "license": {
+      "name": "Licence non declaree sur le depot ComfyUI",
+      "url": "https://huggingface.co/Comfy-Org/HunyuanImage_2.1_ComfyUI",
+      "summary": "Le depot ComfyUI Hunyuan Image 2.1 ne declare pas de licence explicite dans les metadonnees Hugging Face.",
+      "usage": "Usage local a verifier avec les conditions Tencent/Hunyuan d'origine avant redistribution, publication ou usage commercial.",
+      "restrictions": [
+        "Verifier la licence d'origine avant tout usage autre que des tests locaux.",
+        "Ne pas redistribuer le modele sans droits explicites.",
+        "L'utilisateur reste responsable des contenus generes et du respect des droits de tiers."
+      ]
+    },
+    "workflowTemplate": "unetDualClipVae",
+    "workflow": {
+      "diffusionModelName": "hunyuanimage2.1_fp8_e4m3fn.safetensors",
+      "clipName1": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+      "clipName2": "byt5_small_glyphxl_fp16.safetensors",
+      "clipType": "hunyuan_image",
+      "vaeName": "hunyuan_image_2.1_vae_fp16.safetensors",
+      "cfg": 3.5,
+      "height": 2048,
+      "latentNodeClass": "EmptyHunyuanImageLatent",
+      "negativePrompt": "low quality, bad anatomy, extra digits, missing digits, extra limbs, missing limbs",
+      "samplerName": "euler",
+      "scheduler": "simple",
+      "steps": 20,
+      "width": 2048,
+      "filenamePrefix": "assistia-hunyuan-image"
+    },
+    "downloads": [
+      {
+        "url": "https://huggingface.co/Comfy-Org/HunyuanImage_2.1_ComfyUI/resolve/main/split_files/diffusion_models/hunyuanimage2.1_fp8_e4m3fn.safetensors",
+        "destinationDirectory": "diffusion_models",
+        "fileName": "hunyuanimage2.1_fp8_e4m3fn.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/Comfy-Org/HunyuanImage_2.1_ComfyUI/resolve/main/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors",
+        "destinationDirectory": "text_encoders",
+        "fileName": "qwen_2.5_vl_7b_fp8_scaled.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/Comfy-Org/HunyuanImage_2.1_ComfyUI/resolve/main/split_files/text_encoders/byt5_small_glyphxl_fp16.safetensors",
+        "destinationDirectory": "text_encoders",
+        "fileName": "byt5_small_glyphxl_fp16.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/Comfy-Org/HunyuanImage_2.1_ComfyUI/resolve/main/split_files/vae/hunyuan_image_2.1_vae_fp16.safetensors",
+        "destinationDirectory": "vae",
+        "fileName": "hunyuan_image_2.1_vae_fp16.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "FLUX.2 Dev FP8",
+    "description": "Modele Flux 2 Dev local avec encodeur Mistral dedie et scheduler Flux2.",
+    "architecture": "Flux 2",
+    "recommendedMemory": "GPU 24 Go+ conseille",
+    "tags": [
+      "diffusion-model",
+      "fp8",
+      "non-commercial"
+    ],
+    "notes": [
+      "Flux 2 est beaucoup plus volumineux que Flux 1 Schnell.",
+      "Le workflow texte-vers-image utilise SamplerCustomAdvanced, FluxGuidance et Flux2Scheduler."
+    ],
+    "license": {
+      "name": "FLUX.1 [dev] Non-Commercial License",
+      "url": "https://huggingface.co/Comfy-Org/flux2-dev",
+      "summary": "Licence non commerciale declaree sur le depot Comfy-Org Flux 2 Dev.",
+      "usage": "Usage local, recherche, tests et creation non commerciale, sous reserve du respect de la licence Flux Dev.",
+      "restrictions": [
+        "Usage commercial non autorise sans licence adaptee.",
+        "Respecter les restrictions de la licence Flux Dev.",
+        "L'utilisateur reste responsable des contenus generes et du respect des droits de tiers."
+      ]
+    },
+    "workflowPath": "workflows/flux2-dev-fp8.json",
+    "promptAttributeName": "6.inputs.text",
+    "downloads": [
+      {
+        "url": "https://huggingface.co/Comfy-Org/flux2-dev/resolve/main/split_files/diffusion_models/flux2_dev_fp8mixed.safetensors",
+        "destinationDirectory": "diffusion_models",
+        "fileName": "flux2_dev_fp8mixed.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/Comfy-Org/flux2-dev/resolve/main/split_files/text_encoders/mistral_3_small_flux2_fp8.safetensors",
+        "destinationDirectory": "text_encoders",
+        "fileName": "mistral_3_small_flux2_fp8.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/Comfy-Org/flux2-dev/resolve/main/split_files/vae/flux2-vae.safetensors",
+        "destinationDirectory": "vae",
+        "fileName": "flux2-vae.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "Playground v2.5",
+    "description": "Modele 1024px oriente esthetique et rendu detaille.",
+    "architecture": "Stable Diffusion XL",
+    "recommendedMemory": "GPU 8 Go+ conseille",
+    "tags": [
+      "checkpoint",
+      "1024px",
+      "esthetique"
+    ],
+    "license": {
+      "name": "Playground v2.5 Community License",
+      "url": "https://huggingface.co/playgroundai/playground-v2.5-1024px-aesthetic/blob/main/LICENSE.md",
+      "summary": "Licence communautaire Playground v2.5 avec droits d'utilisation encadres par ses conditions propres.",
+      "usage": "Utilisation locale autorisee selon la licence communautaire Playground. Consultez le texte complet avant redistribution ou usage public.",
+      "restrictions": [
+        "Respecter les limites de la licence communautaire Playground v2.5.",
+        "Respecter les droits de tiers et les lois applicables.",
+        "Verifier les conditions avant integration dans un service commercial ou public."
+      ]
+    },
+    "workflowPath": "workflows/playground-v2-5.json",
+    "promptAttributeName": "6.inputs.text",
+    "downloads": [
+      {
+        "url": "https://huggingface.co/playgroundai/playground-v2.5-1024px-aesthetic/resolve/main/playground-v2.5-1024px-aesthetic.fp16.safetensors",
+        "destinationDirectory": "checkpoints",
+        "fileName": "playground-v2.5-1024px-aesthetic.fp16.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "Stable Diffusion v1-4",
+    "description": "Modele Stable Diffusion historique, leger et adapte aux generations 512px.",
+    "architecture": "Stable Diffusion 1.x",
+    "recommendedMemory": "GPU 4 Go+ conseille",
+    "tags": [
+      "checkpoint",
+      "leger",
+      "512px"
+    ],
+    "license": {
+      "name": "CreativeML OpenRAIL-M",
+      "url": "https://huggingface.co/CompVis/stable-diffusion-v-1-4-original",
+      "summary": "Licence OpenRAIL-M autorisant l'utilisation du modele avec des restrictions d'usage responsable.",
+      "usage": "Creation locale, recherche et experimentation, sous reserve des restrictions OpenRAIL-M.",
+      "restrictions": [
+        "Interdit les usages illegaux, nuisibles, trompeurs ou discriminatoires.",
+        "L'utilisateur doit respecter les droits des personnes et des tiers.",
+        "Les redistributions doivent conserver les conditions de licence applicables."
+      ]
+    },
+    "workflowPath": "workflows/sd-v1-4.json",
+    "promptAttributeName": "6.inputs.text",
+    "downloads": [
+      {
+        "url": "https://huggingface.co/CompVis/stable-diffusion-v-1-4-original/resolve/main/sd-v1-4.ckpt",
+        "destinationDirectory": "checkpoints",
+        "fileName": "sd-v1-4.ckpt"
+      }
+    ]
+  },
+  {
+    "name": "Stable Diffusion v1-5",
+    "description": "Modele Stable Diffusion 1.5 classique, largement compatible avec les workflows et LoRA SD 1.x.",
+    "architecture": "Stable Diffusion 1.x",
+    "recommendedMemory": "GPU 4 Go+ conseille",
+    "tags": [
+      "checkpoint",
+      "leger",
+      "512px"
+    ],
+    "license": {
+      "name": "CreativeML OpenRAIL-M",
+      "url": "https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5",
+      "summary": "Licence OpenRAIL-M autorisant l'utilisation du modele avec des restrictions d'usage responsable.",
+      "usage": "Creation locale, recherche, experimentation et outils creatifs, sous reserve des restrictions OpenRAIL-M.",
+      "restrictions": [
+        "Interdit les usages illegaux, nuisibles, trompeurs ou discriminatoires.",
+        "L'utilisateur doit respecter les droits des personnes et des tiers.",
+        "Les redistributions doivent conserver les conditions de licence applicables."
+      ]
+    },
+    "workflowTemplate": "checkpoint",
+    "workflow": {
+      "checkpointName": "v1-5-pruned-emaonly.safetensors",
+      "cfg": 7.5,
+      "height": 512,
+      "negativePrompt": "blurry, low quality, distorted",
+      "samplerName": "euler",
+      "scheduler": "normal",
+      "steps": 28,
+      "width": 512,
+      "filenamePrefix": "assistia-sd-v1-5"
+    },
+    "downloads": [
+      {
+        "url": "https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors",
+        "destinationDirectory": "checkpoints",
+        "fileName": "v1-5-pruned-emaonly.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "OpenJourney v4",
+    "description": "Modele SD 1.x oriente illustration stylisee, utilisable en 512px.",
+    "architecture": "Stable Diffusion 1.x",
+    "recommendedMemory": "GPU 4 Go+ conseille",
+    "tags": [
+      "checkpoint",
+      "illustration",
+      "512px"
+    ],
+    "license": {
+      "name": "CreativeML OpenRAIL-M",
+      "url": "https://huggingface.co/prompthero/openjourney-v4",
+      "summary": "Licence OpenRAIL-M permettant l'utilisation sous conditions d'usage responsable.",
+      "usage": "Generation locale d'images stylisees et experimentation creative, sous reserve du respect de la licence.",
+      "restrictions": [
+        "Interdit les usages illegaux, nuisibles, trompeurs ou discriminatoires.",
+        "Respecter les droits de tiers et la provenance des contenus.",
+        "Conserver les conditions de licence en cas de redistribution."
+      ]
+    },
+    "workflowPath": "workflows/openjourney-v4.json",
+    "promptAttributeName": "6.inputs.text",
+    "downloads": [
+      {
+        "url": "https://huggingface.co/prompthero/openjourney-v4/resolve/main/openjourney-v4.ckpt",
+        "destinationDirectory": "checkpoints",
+        "fileName": "openjourney-v4.ckpt"
+      }
+    ]
+  }
+]

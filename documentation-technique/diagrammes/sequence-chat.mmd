@@ -1,0 +1,33 @@
+sequenceDiagram
+  actor U as Utilisateur
+  participant Chat as ChatPage.tsx
+  participant Ctx as ChatContext.tsx
+  participant Tauri as services/tauris.ts
+  participant Main as main.rs
+  participant Search as web_search.rs
+  participant SearXNG as SearXNG
+  participant Ollama as ollama.rs
+  participant API as API Ollama
+
+  U->>Chat: Saisit puis envoie un message
+  Chat->>Ctx: Ajoute le message utilisateur
+  Chat->>Ctx: Ajoute un message assistant en attente
+  opt Recherche web activée et demande récente
+    Chat->>Tauri: searchWeb(message)
+    Tauri->>Main: invoke search_web
+    Main->>Search: run_web_search(app, message)
+    Search->>SearXNG: GET /search?q=...&format=json
+    SearXNG-->>Search: Résultats JSON
+    Search-->>Chat: Sources web
+    Chat->>Chat: Ajoute un contexte system avec les sources
+  end
+  Chat->>Tauri: sendOllamaChatMessage(modele, messages)
+  Tauri->>Main: invoke send_ollama_chat_message
+  Main->>Ollama: send_chat_message(app, modele, messages)
+  Ollama->>Ollama: ensure_ollama_server()
+  Ollama->>API: POST /api/chat stream=false
+  API-->>Ollama: Réponse JSON
+  Ollama-->>Main: OllamaChatResponse
+  Main-->>Tauri: Résultat Tauri
+  Tauri-->>Chat: message assistant
+  Chat->>Ctx: Remplace le message en attente
