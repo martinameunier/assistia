@@ -2,7 +2,10 @@ import React, {
   type FormEvent
 } from "react";
 
-import type { Translations }
+import type {
+  Language,
+  Translations
+}
 from "../../i18n";
 import {
   type ChatHistorySecurityState,
@@ -38,6 +41,8 @@ import WebSearchSettingsSection
 from "../settings/WebSearchSettingsSection";
 import ChatHistorySecuritySection
 from "../settings/ChatHistorySecuritySection";
+import LanguageSelector
+from "../layout/LanguageSelector";
 
 type Props = {
   chatHistorySecurityState: ChatHistorySecurityState;
@@ -70,6 +75,7 @@ type Props = {
   isLoadingWebSearchSettings: boolean;
   isSavingWebSearchSettings: boolean;
   labels: Translations;
+  language: Language;
   logs: string[];
   pendingInstallationAction: PendingInstallationAction;
   webSearchSettings: WebSearchSettings;
@@ -100,6 +106,7 @@ type Props = {
   onInstallImageGenerator: () => void;
   onInstallRequiredComponents: () => void;
   onInstallWebSearch: () => void;
+  onLanguageChange: (language: Language) => void;
   onSaveDeveloperAgentSettings: (event: FormEvent<HTMLFormElement>) => void;
   onSaveImageGeneratorSettings: (event: FormEvent<HTMLFormElement>) => void;
   onSaveWebSearchSettings: (event: FormEvent<HTMLFormElement>) => void;
@@ -136,6 +143,7 @@ export default function SettingsPage({
   isSavingImageGeneratorSettings,
   isSavingWebSearchSettings,
   labels,
+  language,
   logs,
   pendingInstallationAction,
   webSearchSettings,
@@ -154,6 +162,7 @@ export default function SettingsPage({
   onInstallImageGenerator,
   onInstallRequiredComponents,
   onInstallWebSearch,
+  onLanguageChange,
   onSaveDeveloperAgentSettings,
   onSaveImageGeneratorSettings,
   onSaveWebSearchSettings
@@ -167,6 +176,15 @@ export default function SettingsPage({
 
   return (
     <section className="settings-page" aria-labelledby="page-title">
+      <section className="settings-section" aria-label={labels.language.label}>
+        <LanguageSelector
+          className="settings-language-control"
+          labels={labels.language}
+          language={language}
+          onChange={onLanguageChange}
+        />
+      </section>
+
       <InstallationSection
         installationFeedback={installationFeedback}
         isComfyUIInstalled={isComfyUIInstalled}

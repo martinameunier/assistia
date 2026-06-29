@@ -245,7 +245,12 @@ textarea {
 }
 
 .app-main {
+  min-height: 100vh;
+  min-height: 100dvh;
   min-width: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   overflow-x: hidden;
   padding-bottom: 44px;
 }
@@ -301,8 +306,13 @@ textarea {
 }
 
 .logs-page {
+  min-height: 0;
   display: grid;
   gap: 18px;
+  grid-template-rows: minmax(0, 1fr);
+  height: clamp(520px, calc(100vh - 210px), 760px);
+  height: clamp(520px, calc(100dvh - 210px), 760px);
+  overflow: auto;
 }
 
 .titre-statut {
@@ -345,6 +355,21 @@ textarea {
 .language-select select:focus-visible {
   outline: 3px solid rgba(37, 99, 235, 0.28);
   outline-offset: 2px;
+}
+
+.settings-language-control {
+  min-width: 0;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.settings-language-control .language-select {
+  color: #0f172a;
+}
+
+.settings-language-control .language-select select {
+  min-width: min(240px, 100%);
+  box-shadow: none;
 }
 
 .status-grid {
@@ -518,6 +543,7 @@ textarea {
 .log-console {
   width: 100%;
   height: 260px;
+  box-sizing: border-box;
   margin: 0;
   padding: 14px;
   border: 1px solid rgba(34, 197, 94, 0.28);
@@ -530,6 +556,11 @@ textarea {
   overflow-wrap: anywhere;
   font: 0.82rem ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   line-height: 1.45;
+}
+
+.logs-page .log-console {
+  height: auto;
+  min-height: 0;
 }
 
 .log-console a {

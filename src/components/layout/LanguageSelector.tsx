@@ -4,19 +4,21 @@ import type { Language, Translations }
 from "../../i18n";
 
 type Props = {
+  className?: string;
   labels: Translations["language"];
   language: Language;
   onChange: (language: Language) => void;
 };
 
 export default function LanguageSelector({
+  className = "app-toolbar",
   labels,
   language,
   onChange
 }: Props) {
 
   return (
-    <div className="app-toolbar">
+    <div className={className}>
       <label className="language-select">
         <span>{labels.label}</span>
         <select

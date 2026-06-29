@@ -1,9 +1,8 @@
 import React, { type ReactNode } from "react";
 
-import type { Language, Translations } from "../../i18n";
+import type { Translations } from "../../i18n";
 import type { AppSection } from "../../types/launcher";
 import AppNavigation from "./AppNavigation";
-import LanguageSelector from "./LanguageSelector";
 import PageHeader from "./PageHeader";
 
 type PageLabels = {
@@ -18,8 +17,6 @@ type Props = {
   children: ReactNode;
   isSidebarCollapsed: boolean;
   labels: Translations;
-  language: Language;
-  onChangeLanguage: (language: Language) => void;
   onChangeSection: (section: AppSection) => void;
   onOpenDocumentation: () => void;
   onOpenLicense: () => void;
@@ -33,8 +30,6 @@ export default function AppShell({
   children,
   isSidebarCollapsed,
   labels,
-  language,
-  onChangeLanguage,
   onChangeSection,
   onOpenDocumentation,
   onOpenLicense,
@@ -62,12 +57,6 @@ export default function AppShell({
       />
 
       <main className="app-main">
-        <LanguageSelector
-          labels={labels.language}
-          language={language}
-          onChange={onChangeLanguage}
-        />
-
         <PageHeader
           kicker={activePage.kicker}
           subtitle={activePage.subtitle}

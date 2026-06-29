@@ -722,6 +722,7 @@ export default function App() {
           isSavingImageGeneratorSettings={isSavingImageGeneratorSettings}
           isSavingWebSearchSettings={isSavingWebSearchSettings}
           labels={labels}
+          language={language}
           logs={translatedLogs}
           pendingInstallationAction={pendingInstallationAction}
           webSearchSettings={webSearchSettings}
@@ -740,6 +741,7 @@ export default function App() {
           onInstallImageGenerator={installComfyUI}
           onInstallRequiredComponents={installRequiredComponents}
           onInstallWebSearch={installSearXNG}
+          onLanguageChange={setLanguage}
           onSaveDeveloperAgentSettings={saveDeveloperAgentSettings}
           onSaveImageGeneratorSettings={saveImageGeneratorSettings}
           onSaveWebSearchSettings={saveWebSearchSettings}
@@ -763,8 +765,6 @@ export default function App() {
           activeSection={activeSection}
           isSidebarCollapsed={isSidebarCollapsed}
           labels={labels}
-          language={language}
-          onChangeLanguage={setLanguage}
           onChangeSection={setActiveSection}
           onOpenDocumentation={openDocumentation}
           onOpenLicense={() => setIsLicenseDialogOpen(true)}
