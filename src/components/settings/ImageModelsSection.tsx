@@ -31,6 +31,7 @@ import { parseComfyUIModelDownloadProgress }
 from "../../utils/comfyUIModelProgress";
 
 type Props = {
+  chatImageModelName: string;
   imageModelAction: ImageGeneratorModelAction;
   imageModelActionFeedback: ImageGeneratorModelActionFeedback;
   imageModelAvailability: ImageGeneratorModelAvailability[];
@@ -39,11 +40,13 @@ type Props = {
   isLoadingImageModels: boolean;
   labels: Translations["settings"];
   logs: string[];
+  onChatImageModelChange: (modelName: string) => void;
   onDeleteImageModel: (model: ImageGeneratorModel) => void;
   onDownloadImageModel: (model: ImageGeneratorModel) => void;
 };
 
 export default function ImageModelsSection({
+  chatImageModelName,
   imageModelAction,
   imageModelActionFeedback,
   imageModelAvailability,
@@ -52,6 +55,7 @@ export default function ImageModelsSection({
   isLoadingImageModels,
   labels,
   logs,
+  onChatImageModelChange,
   onDeleteImageModel,
   onDownloadImageModel
 }: Props) {
@@ -75,6 +79,19 @@ export default function ImageModelsSection({
       () => parseComfyUIModelDownloadProgress(logs.join("\n")),
       [logs]
     );
+
+  const downloadedImageModels =
+    useMemo(
+      () => imageGeneratorModels.filter((model) =>
+        modelAvailabilityByName.get(model.name) === true
+      ),
+      [modelAvailabilityByName]
+    );
+
+  const selectedChatImageModelName =
+    downloadedImageModels.some((model) => model.name === chatImageModelName)
+      ? chatImageModelName
+      : "";
 
   const modelDownloadProgress =
     parsedModelDownloadProgress === null
@@ -101,6 +118,37 @@ export default function ImageModelsSection({
           <h2 id="settings-image-models-title">{labels.imageModelsTitle}</h2>
           <p>{labels.imageModelsHelp}</p>
         </div>
+      </div>
+
+      <div className="settings-choice-panel">
+        <label className="settings-field">
+          <span>{labels.chatImageModelLabel}</span>
+          <select
+            value={selectedChatImageModelName}
+            disabled={
+              !isComfyUIInstalled
+              || isLoadingImageModels
+              || downloadedImageModels.length === 0
+            }
+            onChange={(event) => {
+              onChatImageModelChange(event.target.value);
+            }}
+          >
+            <option value="">
+              {downloadedImageModels.length === 0
+                ? labels.chatImageModelEmpty
+                : labels.chatImageModelPlaceholder}
+            </option>
+            {downloadedImageModels.map((model) => (
+              <option key={model.name} value={model.name}>
+                {model.name}
+              </option>
+            ))}
+          </select>
+          <span className="settings-field__hint">
+            {labels.chatImageModelHelp}
+          </span>
+        </label>
       </div>
 
       {isLoadingImageModels && (

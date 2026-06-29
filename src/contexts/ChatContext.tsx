@@ -15,12 +15,16 @@ import {
   listChatConversations,
   saveChatConversation,
   type ChatConversation,
-  type ChatConversationSummary
+  type ChatConversationSummary,
+  type ComfyUIGeneratedImage
 } from "../services/tauris";
 
 export type ChatMessage = {
   content: string;
   id: number;
+  generatedImage?: ComfyUIGeneratedImage;
+  imageAlt?: string;
+  imageDataUrl?: string;
   role: "assistant" | "user";
   status?: "pending";
   transient?: boolean;

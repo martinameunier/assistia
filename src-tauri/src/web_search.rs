@@ -1,6 +1,6 @@
 use crate::common::{
     command_output_with_timeout, ensure_curl, hide_command_window, read_settings, write_settings,
-    LauncherSettings, WebSearchSettings,
+    LauncherSettings, WebSearchSettings, DEFAULT_SEARXNG_URL,
 };
 use serde::Serialize;
 use serde_json::Value;
@@ -36,9 +36,17 @@ pub fn get_web_search_settings(app: AppHandle) -> Result<WebSearchSettings, Stri
 #[tauri::command]
 pub fn set_web_search_settings(app: AppHandle, settings: WebSearchSettings) -> Result<(), String> {
     let mut launcher_settings: LauncherSettings = read_settings(&app);
+    let use_local_searxng_url = settings.use_local_searxng_url;
+    let searxng_url = if use_local_searxng_url {
+        DEFAULT_SEARXNG_URL.to_string()
+    } else {
+        normalize_searxng_url(&settings.searxng_url)?
+    };
+
     launcher_settings.web_search = WebSearchSettings {
         enabled: settings.enabled,
-        searxng_url: normalize_searxng_url(&settings.searxng_url)?,
+        use_local_searxng_url,
+        searxng_url,
         max_results: normalize_max_results(settings.max_results),
     };
 

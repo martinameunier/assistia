@@ -1,6 +1,8 @@
 import React, {
   useEffect,
+  useLayoutEffect,
   useMemo,
+  useRef,
   useState
 } from "react";
 
@@ -9,16 +11,24 @@ import {
   Cpu,
   Download,
   Globe2,
+  ImagePlus,
   MessageSquarePlus,
+  Save,
   Send,
+  Square,
   Trash2,
   User
 } from "lucide-react";
 
 import type { Translations } from "../../i18n";
 import {
+  queueComfyUIImageGeneration,
+  interruptComfyUIImageGeneration,
+  saveComfyUIGeneratedImage,
   searchWeb,
   sendOllamaChatMessage,
+  stopOllamaChatMessage,
+  type ComfyUIGeneratedImage,
   type OllamaChatMessage,
   type WebSearchResponse,
   type WebSearchSettings
@@ -36,10 +46,18 @@ import type {
 import type {
   ChatModel
 } from "../../utils/chatModels";
+import {
+  buildWorkflowForPrompt,
+  type ImageGeneratorModel
+} from "../../utils/imageGeneratorModels";
+import { useLauncherStore }
+from "../../store/launcherStore";
 
 type Props = {
   availableModels: ChatModel[];
+  imageGenerationModel: ImageGeneratorModel | undefined;
   isLoadingModels: boolean;
+  isComfyUIRunning: boolean;
   installationFeedback: InstallationFeedback;
   isOllamaInstalled: boolean;
   isOllamaRunning: boolean;
@@ -102,7 +120,9 @@ function formatConversationDate(timestamp: number) {
 
 export default function ChatPage({
   availableModels,
+  imageGenerationModel,
   isLoadingModels,
+  isComfyUIRunning,
   installationFeedback,
   isOllamaInstalled,
   isOllamaRunning,
@@ -134,6 +154,30 @@ export default function ChatPage({
 
   const [isWebSearchRequested, setIsWebSearchRequested] =
     useState(false);
+
+  const [isImageGenerationRequested, setIsImageGenerationRequested] =
+    useState(false);
+
+  const [savingImageMessageId, setSavingImageMessageId] =
+    useState<number | null>(null);
+
+  const textareaRef =
+    useRef<HTMLTextAreaElement | null>(null);
+
+  const activeRequestIdRef =
+    useRef<number | null>(null);
+
+  const nextRequestIdRef =
+    useRef(0);
+
+  const pendingMessageIdRef =
+    useRef<number | null>(null);
+
+  const activeRequestTypeRef =
+    useRef<"chat" | "image" | null>(null);
+
+  const addGeneratedImage =
+    useLauncherStore((state) => state.addGeneratedImage);
 
   const hasAvailableModels =
     availableModels.length > 0;
@@ -173,6 +217,28 @@ export default function ChatPage({
   const isWebSearchActive =
     webSearchSettings.enabled && isWebSearchRequested;
 
+  const isImageGenerationActive =
+    isImageGenerationRequested;
+
+  const canRequestImageGeneration =
+    imageGenerationModel !== undefined
+    && isComfyUIRunning
+    && !isSending;
+
+  const canGenerateImage =
+    isOllamaRunning
+    && isComfyUIRunning
+    && hasAvailableModels
+    && selectedModelDefinition !== undefined
+    && imageGenerationModel !== undefined
+    && draftMessage.trim() !== ""
+    && !isSending;
+
+  const canSubmit =
+    isImageGenerationActive
+      ? canGenerateImage
+      : canSend;
+
   useEffect(() => {
     if (isLoadingModels) {
       return;
@@ -203,6 +269,99 @@ export default function ChatPage({
     isWebSearchRequested,
     webSearchSettings.enabled
   ]);
+
+  useEffect(() => {
+    if (!canRequestImageGeneration && isImageGenerationRequested) {
+      setIsImageGenerationRequested(false);
+    }
+  }, [
+    canRequestImageGeneration,
+    isImageGenerationRequested
+  ]);
+
+  useLayoutEffect(() => {
+    const textarea =
+      textareaRef.current;
+
+    if (textarea === null) {
+      return;
+    }
+
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, [draftMessage]);
+
+  function beginChatRequest(
+    pendingMessageId: number,
+    requestType: "chat" | "image"
+  ) {
+    nextRequestIdRef.current += 1;
+    activeRequestIdRef.current =
+      nextRequestIdRef.current;
+    pendingMessageIdRef.current =
+      pendingMessageId;
+    activeRequestTypeRef.current =
+      requestType;
+
+    return nextRequestIdRef.current;
+  }
+
+  function isActiveChatRequest(requestId: number) {
+    return activeRequestIdRef.current === requestId;
+  }
+
+  function finishChatRequest(requestId: number) {
+    if (!isActiveChatRequest(requestId)) {
+      return;
+    }
+
+    activeRequestIdRef.current =
+      null;
+    pendingMessageIdRef.current =
+      null;
+    activeRequestTypeRef.current =
+      null;
+    setIsSending(false);
+  }
+
+  function stopCurrentRequest() {
+    const pendingMessageId =
+      pendingMessageIdRef.current;
+    const activeRequestType =
+      activeRequestTypeRef.current;
+
+    activeRequestIdRef.current =
+      null;
+    pendingMessageIdRef.current =
+      null;
+    activeRequestTypeRef.current =
+      null;
+    setIsSending(false);
+
+    if (pendingMessageId !== null) {
+      setMessages((currentMessages) =>
+        currentMessages.map((chatMessage) =>
+          chatMessage.id === pendingMessageId
+            ? {
+                ...chatMessage,
+                content: labels.requestStoppedMessage,
+                status: undefined
+              }
+            : chatMessage
+        )
+      );
+    }
+
+    const stopRequests = [
+      stopOllamaChatMessage()
+    ];
+
+    if (activeRequestType === "image") {
+      stopRequests.push(interruptComfyUIImageGeneration());
+    }
+
+    void Promise.allSettled(stopRequests);
+  }
 
   async function sendMessage() {
 
@@ -237,6 +396,8 @@ export default function ChatPage({
     setIsSending(true);
     const pendingMessage =
       appendMessage("assistant", labels.processingMessage, "pending");
+    const requestId =
+      beginChatRequest(pendingMessage.id, "chat");
 
     try {
       const shouldSearchWeb =
@@ -258,6 +419,14 @@ export default function ChatPage({
 
         webSearchResponse =
           await searchWeb(message);
+
+        if (!isActiveChatRequest(requestId)) {
+          return;
+        }
+      }
+
+      if (!isActiveChatRequest(requestId)) {
+        return;
       }
 
       setMessages((currentMessages) =>
@@ -303,6 +472,10 @@ export default function ChatPage({
           modelMessages
         );
 
+      if (!isActiveChatRequest(requestId)) {
+        return;
+      }
+
       const responseContent =
         response.message
         + (
@@ -323,6 +496,10 @@ export default function ChatPage({
         )
       );
     } catch (error) {
+      if (!isActiveChatRequest(requestId)) {
+        return;
+      }
+
       setMessages((currentMessages) =>
         currentMessages.map((chatMessage) =>
           chatMessage.id === pendingMessage.id
@@ -335,7 +512,161 @@ export default function ChatPage({
         )
       );
     } finally {
-      setIsSending(false);
+      finishChatRequest(requestId);
+    }
+  }
+
+  async function generateImageFromChat() {
+
+    const message =
+      draftMessage.trim();
+
+    if (message === "" || isSending) {
+      return;
+    }
+
+    if (!isOllamaRunning) {
+      appendMessage("assistant", labels.ollamaStoppedMessage);
+      return;
+    }
+
+    if (!hasAvailableModels || selectedModelDefinition === undefined) {
+      appendMessage("assistant", labels.missingModelMessage);
+      return;
+    }
+
+    if (!isComfyUIRunning) {
+      appendMessage("assistant", labels.imageGeneratorStoppedMessage);
+      return;
+    }
+
+    if (imageGenerationModel === undefined) {
+      appendMessage("assistant", labels.missingImageModelMessage);
+      return;
+    }
+
+    const userMessage =
+      appendMessage("user", message);
+
+    setDraftMessage("");
+    setIsWebSearchRequested(false);
+    setIsImageGenerationRequested(false);
+    setIsSending(true);
+    const pendingMessage =
+      appendMessage("assistant", labels.imagePromptImprovingMessage, "pending");
+    const requestId =
+      beginChatRequest(pendingMessage.id, "image");
+
+    try {
+      const promptResponse =
+        await sendOllamaChatMessage(
+          selectedModelDefinition.name,
+          [
+            {
+              role: "system",
+              content: labels.imagePromptInstruction
+            },
+            {
+              role: "user",
+              content: userMessage.content
+            }
+          ]
+        );
+
+      if (!isActiveChatRequest(requestId)) {
+        return;
+      }
+
+      const enhancedPrompt =
+        cleanEnhancedImagePrompt(promptResponse.message);
+
+      setMessages((currentMessages) =>
+        currentMessages.map((chatMessage) =>
+          chatMessage.id === pendingMessage.id
+            ? {
+                ...chatMessage,
+                content: labels.imageGeneratingMessage
+              }
+            : chatMessage
+        )
+      );
+
+      const workflow =
+        buildWorkflowForPrompt(imageGenerationModel, enhancedPrompt);
+      const response =
+        await queueComfyUIImageGeneration(workflow);
+
+      if (!isActiveChatRequest(requestId)) {
+        return;
+      }
+
+      const imageId =
+        createChatGeneratedImageId();
+
+      addGeneratedImage({
+        createdAt: Date.now(),
+        id: imageId,
+        image: response.image,
+        modelName: imageGenerationModel.name,
+        prompt: enhancedPrompt,
+        promptId: response.prompt_id
+      });
+
+      setMessages((currentMessages) =>
+        currentMessages.map((chatMessage) =>
+          chatMessage.id === pendingMessage.id
+            ? {
+                ...chatMessage,
+                content: [
+                  labels.imageGeneratedMessage,
+                  "",
+                  `${labels.imagePromptUsedLabel} ${enhancedPrompt}`
+                ].join("\n"),
+                generatedImage: response.image,
+                imageAlt: labels.generatedImageAlt,
+                imageDataUrl: response.image.data_url,
+                status: undefined
+              }
+            : chatMessage
+        )
+      );
+    } catch (error) {
+      if (!isActiveChatRequest(requestId)) {
+        return;
+      }
+
+      setMessages((currentMessages) =>
+        currentMessages.map((chatMessage) =>
+          chatMessage.id === pendingMessage.id
+            ? {
+                ...chatMessage,
+                content: `${labels.imageGenerationErrorMessage}\n${String(error)}`,
+                status: undefined
+              }
+            : chatMessage
+        )
+      );
+    } finally {
+      finishChatRequest(requestId);
+    }
+  }
+
+  async function saveGeneratedChatImage(
+    image: ComfyUIGeneratedImage,
+    messageId: number
+  ) {
+
+    setSavingImageMessageId(messageId);
+
+    try {
+      await saveComfyUIGeneratedImage(image);
+    } catch (error) {
+      appendMessage(
+        "assistant",
+        `${labels.imageSaveErrorMessage}\n${String(error)}`
+      );
+    } finally {
+      setSavingImageMessageId(null);
     }
   }
 
@@ -523,6 +854,41 @@ export default function ChatPage({
                       <span className="chat-thinking-dot" aria-hidden="true" />
                     )}
                     <ChatMarkdown content={message.content} />
+                    {message.imageDataUrl !== undefined && (
+                      <>
+                        <img
+                          className="chat-generated-image"
+                          alt={message.imageAlt ?? labels.generatedImageAlt}
+                          src={message.imageDataUrl}
+                        />
+                        {message.generatedImage !== undefined && (
+                          <div className="chat-generated-image__actions">
+                            <button
+                              type="button"
+                              className="settings-save-button"
+                              disabled={savingImageMessageId !== null}
+                              onClick={() => {
+                                void saveGeneratedChatImage(
+                                  message.generatedImage!,
+                                  message.id
+                                );
+                              }}
+                            >
+                              {savingImageMessageId === message.id ? (
+                                <span className="button-loader" aria-hidden="true" />
+                              ) : (
+                                <Save size={18} />
+                              )}
+                              <span>
+                                {savingImageMessageId === message.id
+                                  ? labels.savingGeneratedImageAction
+                                  : labels.saveGeneratedImageAction}
+                              </span>
+                            </button>
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
                 ) : (
                   <p>
@@ -537,59 +903,127 @@ export default function ChatPage({
             className="developer-agent-composer chat-composer"
             onSubmit={(event) => {
               event.preventDefault();
-              sendMessage();
+              if (isImageGenerationActive) {
+                void generateImageFromChat();
+              } else {
+                void sendMessage();
+              }
             }}
           >
-            <button
-              type="button"
-              className={
-                isWebSearchActive
-                  ? "chat-composer__web-toggle chat-composer__web-toggle--active"
-                  : "chat-composer__web-toggle"
-              }
-              disabled={!canRequestWebSearch}
-              aria-pressed={isWebSearchActive}
-              aria-label={
-                isWebSearchActive
-                  ? labels.webSearchToggleOn
-                  : webSearchSettings.enabled
-                    ? labels.webSearchToggleOff
-                    : labels.webSearchToggleUnavailable
-              }
-              title={
-                isWebSearchActive
-                  ? labels.webSearchToggleOn
-                  : webSearchSettings.enabled
-                    ? labels.webSearchToggleOff
-                    : labels.webSearchToggleUnavailable
-              }
-              onClick={() => {
-                setIsWebSearchRequested((currentValue) => !currentValue);
-              }}
-            >
-              <Globe2 size={20} />
-            </button>
+            <div className="chat-composer__actions" aria-label={labels.chatActionsLabel}>
+              <button
+                type="button"
+                className={
+                  isWebSearchActive
+                    ? "chat-composer__web-toggle chat-composer__web-toggle--active"
+                    : "chat-composer__web-toggle"
+                }
+                disabled={!canRequestWebSearch}
+                aria-pressed={isWebSearchActive}
+                aria-label={
+                  isWebSearchActive
+                    ? labels.webSearchToggleOn
+                    : webSearchSettings.enabled
+                      ? labels.webSearchToggleOff
+                      : labels.webSearchToggleUnavailable
+                }
+                title={
+                  isWebSearchActive
+                    ? labels.webSearchToggleOn
+                    : webSearchSettings.enabled
+                      ? labels.webSearchToggleOff
+                      : labels.webSearchToggleUnavailable
+                }
+                onClick={() => {
+                  setIsWebSearchRequested((currentValue) => {
+                    const nextValue =
+                      !currentValue;
+
+                    if (nextValue) {
+                      setIsImageGenerationRequested(false);
+                    }
+
+                    return nextValue;
+                  });
+                }}
+              >
+                <Globe2 size={20} />
+              </button>
+              <button
+                type="button"
+                className={
+                  isImageGenerationActive
+                    ? "chat-composer__image-toggle chat-composer__image-toggle--active"
+                    : "chat-composer__image-toggle"
+                }
+                disabled={!canRequestImageGeneration}
+                aria-pressed={isImageGenerationActive}
+                aria-label={
+                  isImageGenerationActive
+                    ? labels.imageGenerationToggleOn
+                    : imageGenerationModel === undefined || !isComfyUIRunning
+                      ? labels.imageGenerationToggleUnavailable
+                      : labels.imageGenerationToggleOff
+                }
+                title={
+                  isImageGenerationActive
+                    ? labels.imageGenerationToggleOn
+                    : imageGenerationModel === undefined || !isComfyUIRunning
+                      ? labels.imageGenerationToggleUnavailable
+                      : labels.imageGenerationToggleOff
+                }
+                onClick={() => {
+                  setIsImageGenerationRequested((currentValue) => {
+                    const nextValue =
+                      !currentValue;
+
+                    if (nextValue) {
+                      setIsWebSearchRequested(false);
+                    }
+
+                    return nextValue;
+                  });
+                }}
+              >
+                <ImagePlus size={20} />
+              </button>
+            </div>
             <textarea
+              ref={textareaRef}
               value={draftMessage}
               disabled={isSending || !isOllamaRunning || !hasAvailableModels}
               onChange={(event) => setDraftMessage(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === "Enter" && !event.shiftKey) {
                   event.preventDefault();
-                  sendMessage();
+                  if (isImageGenerationActive) {
+                    void generateImageFromChat();
+                  } else {
+                    void sendMessage();
+                  }
                 }
               }}
               placeholder={labels.messagePlaceholder}
               rows={3}
             />
             <button
-              type="submit"
-              className="chat-composer__send-button"
-              disabled={!canSend}
-              aria-label={labels.send}
+              type={isSending ? "button" : "submit"}
+              className={
+                isSending
+                  ? "chat-composer__send-button chat-composer__send-button--stop"
+                  : "chat-composer__send-button"
+              }
+              disabled={!isSending && !canSubmit}
+              aria-label={isSending ? labels.stop : labels.send}
+              title={isSending ? labels.stop : labels.send}
+              onClick={() => {
+                if (isSending) {
+                  stopCurrentRequest();
+                }
+              }}
             >
               {isSending ? (
-                <span className="button-loader" aria-hidden="true" />
+                <Square size={20} />
               ) : (
                 <Send size={20} />
               )}
@@ -599,4 +1033,22 @@ export default function ChatPage({
       </div>
     </section>
   );
+}
+
+function cleanEnhancedImagePrompt(prompt: string) {
+
+  return prompt
+    .replace(/^```[a-z]*\s*/i, "")
+    .replace(/```$/i, "")
+    .trim()
+    .replace(/^["'“”]+|["'“”]+$/g, "");
+}
+
+function createChatGeneratedImageId() {
+
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }

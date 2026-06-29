@@ -1,7 +1,7 @@
 {
   "name": "assistia",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "license": "SEE LICENSE IN LICENSE.md",
   "type": "module",
   "scripts": {
@@ -9,7 +9,12 @@
     "build": "vite build",
     "tauri": "tauri",
     "cert:windows": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/create-windows-self-signed-cert.ps1 -TrustForCurrentUser",
-    "tauri:build:windows": "tauri build"
+    "tauri:build:windows": "tauri build",
+    "release": "bash scripts/release-deploy.sh all",
+    "release:build": "bash scripts/release-deploy.sh build",
+    "release:deploy": "bash scripts/release-deploy.sh deploy",
+    "release:check": "bash scripts/release-deploy.sh check",
+    "documentation:deploy": "bash scripts/deploy-documentation.sh"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.11.0",

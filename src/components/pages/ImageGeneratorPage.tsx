@@ -8,7 +8,8 @@ import {
   Download,
   ExternalLink,
   ImagePlus,
-  Save
+  Save,
+  Trash2
 } from "lucide-react";
 
 import type { Translations }
@@ -18,6 +19,8 @@ import {
   queueComfyUIImageGeneration,
   saveComfyUIGeneratedImage
 } from "../../services/tauris";
+import { useLauncherStore }
+from "../../store/launcherStore";
 import type {
   InstallationFeedback,
   PendingImageGeneratorAction
@@ -58,36 +61,43 @@ export default function ImageGeneratorPage({
   labels,
   logs,
   pendingAction,
+  runtimeProgress,
   onInstall,
   onOpen
 }: Props) {
 
-  const initialModelName =
-    availableModels[0]?.name ?? "";
-
-  const [selectedModelName, setSelectedModelName] =
-    useState(initialModelName);
-
-  const [prompt, setPrompt] =
-    useState("");
-
   const [feedback, setFeedback] =
     useState<ImageGeneratorFeedback>(null);
-
-  const [promptId, setPromptId] =
-    useState<string | null>(null);
-
-  const [isGenerating, setIsGenerating] =
-    useState(false);
-
-  const [generationLogStartIndex, setGenerationLogStartIndex] =
-    useState(0);
 
   const [isSavingImage, setIsSavingImage] =
     useState(false);
 
-  const [generatedImage, setGeneratedImage] =
-    useState<ComfyUIGeneratedImage | null>(null);
+  const failImageGeneration =
+    useLauncherStore((state) => state.failImageGeneration);
+  const finishImageGeneration =
+    useLauncherStore((state) => state.finishImageGeneration);
+  const generatedImages =
+    useLauncherStore((state) => state.imageGeneratorImages);
+  const generationLogStartIndex =
+    useLauncherStore((state) => state.imageGeneratorGenerationLogStartIndex);
+  const isGenerating =
+    useLauncherStore((state) => state.imageGeneratorIsGenerating);
+  const prompt =
+    useLauncherStore((state) => state.imageGeneratorPrompt);
+  const promptId =
+    useLauncherStore((state) => state.imageGeneratorPromptId);
+  const removeGeneratedImage =
+    useLauncherStore((state) => state.removeGeneratedImage);
+  const selectedModelName =
+    useLauncherStore((state) => state.imageGeneratorSelectedModelName);
+  const setPrompt =
+    useLauncherStore((state) => state.setImageGeneratorPrompt);
+  const setSelectedModelName =
+    useLauncherStore((state) => state.setImageGeneratorSelectedModelName);
+  const startImageGeneration =
+    useLauncherStore((state) => state.startImageGeneration);
+  const currentImageId =
+    useLauncherStore((state) => state.imageGeneratorCurrentImageId);
 
   const selectedModel =
     useMemo(
@@ -97,6 +107,10 @@ export default function ImageGeneratorPage({
         selectedModelName
       ]
     );
+
+  const generatedImage =
+    generatedImages.find((item) => item.id === currentImageId)?.image
+    ?? null;
 
   const hasAvailableModels =
     availableModels.length > 0;
@@ -122,7 +136,8 @@ export default function ImageGeneratorPage({
   const generationProgress =
     isGenerating
       ? Math.round(
-        parseComfyUIGenerationProgress(generationLogs.join("\n")) ?? 0
+        parseComfyUIGenerationProgress(generationLogs.join("\n"))
+        ?? Math.min(Math.max(runtimeProgress - 94, 0) * 20, 100)
       )
       : 0;
 
@@ -167,12 +182,11 @@ export default function ImageGeneratorPage({
     if (!availableModels.some((model) => model.name === selectedModelName)) {
       setSelectedModelName(availableModels[0].name);
       setFeedback(null);
-      setPromptId(null);
-      setGeneratedImage(null);
     }
   }, [
     availableModels,
-    selectedModelName
+    selectedModelName,
+    setSelectedModelName
   ]);
 
   async function generateImage(event: React.FormEvent<HTMLFormElement>) {
@@ -184,10 +198,7 @@ export default function ImageGeneratorPage({
     }
 
     setFeedback(null);
-    setPromptId(null);
-    setGeneratedImage(null);
-    setGenerationLogStartIndex(logs.length);
-    setIsGenerating(true);
+    startImageGeneration(logs.length);
 
     try {
       const workflow =
@@ -195,28 +206,29 @@ export default function ImageGeneratorPage({
       const response =
         await queueComfyUIImageGeneration(workflow);
 
-      setPromptId(response.prompt_id);
-      setGeneratedImage(response.image);
+      finishImageGeneration({
+        createdAt: Date.now(),
+        id: createGeneratedImageId(),
+        image: response.image,
+        modelName: selectedModel.name,
+        prompt: trimmedPrompt,
+        promptId: response.prompt_id
+      });
       setFeedback("imageGenerated");
     } catch {
+      failImageGeneration();
       setFeedback("error");
-    } finally {
-      setIsGenerating(false);
     }
   }
 
-  async function saveGeneratedImage() {
-
-    if (generatedImage === null) {
-      return;
-    }
+  async function saveGeneratedImage(image: ComfyUIGeneratedImage) {
 
     setFeedback(null);
     setIsSavingImage(true);
 
     try {
       const didSave =
-        await saveComfyUIGeneratedImage(generatedImage);
+        await saveComfyUIGeneratedImage(image);
 
       if (didSave) {
         setFeedback("imageSaved");
@@ -289,7 +301,7 @@ export default function ImageGeneratorPage({
                 type="button"
                 className="settings-save-button"
                 disabled={isBusy}
-                onClick={saveGeneratedImage}
+                onClick={() => void saveGeneratedImage(generatedImage)}
               >
                 <Save size={18} />
                 <span>
@@ -389,6 +401,71 @@ export default function ImageGeneratorPage({
         )}
       </form>
 
+      {generatedImages.length > 0 && (
+        <section
+          className="image-generator-history"
+          aria-label={labels.generatedImagesHistoryLabel}
+        >
+          <div className="image-generator-history__header">
+            <h2>{labels.generatedImagesHistoryTitle}</h2>
+          </div>
+
+          <div className="image-generator-history__list">
+            {generatedImages.map((item) => (
+              <article
+                key={item.id}
+                className="image-generator-history__item"
+              >
+                <img
+                  alt={labels.generatedImageAlt}
+                  src={item.image.data_url}
+                />
+
+                <div className="image-generator-history__meta">
+                  <strong>{item.modelName}</strong>
+                  <span>{item.prompt}</span>
+                </div>
+
+                <div className="image-generator-history__actions">
+                  <button
+                    type="button"
+                    className="settings-icon-button"
+                    disabled={isBusy}
+                    onClick={() => void saveGeneratedImage(item.image)}
+                    aria-label={labels.saveImageAction}
+                    title={labels.saveImageAction}
+                  >
+                    <Save size={18} />
+                  </button>
+
+                  <button
+                    type="button"
+                    className="settings-icon-button settings-icon-button--danger"
+                    disabled={isBusy}
+                    onClick={() => {
+                      removeGeneratedImage(item.id);
+                      setFeedback(null);
+                    }}
+                    aria-label={labels.deleteGeneratedImageAction}
+                    title={labels.deleteGeneratedImageAction}
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
     </section>
   );
+}
+
+function createGeneratedImageId() {
+
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }

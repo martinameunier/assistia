@@ -14,6 +14,11 @@ import type {
 import type {
   SettingsFeedback
 } from "../../types/launcher";
+import LocalUrlField
+from "./LocalUrlField";
+
+const localOllamaUrl =
+  "http://127.0.0.1:11434";
 
 type Props = {
   developerAgentLabels: Translations["pages"]["developerAgent"]["settingsDialog"];
@@ -22,9 +27,9 @@ type Props = {
   isSavingSettings: boolean;
   settings: DeveloperAgentSettings;
   settingsLabels: Translations["settings"];
-  onSettingChange: (
-    key: keyof DeveloperAgentSettings,
-    value: string
+  onSettingChange: <Key extends keyof DeveloperAgentSettings>(
+    key: Key,
+    value: DeveloperAgentSettings[Key]
   ) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 };
@@ -40,6 +45,9 @@ export default function DeveloperAgentSettingsSection({
   onSubmit
 }: Props) {
 
+  const isDisabled =
+    isSavingSettings || isLoadingSettings;
+
   return (
     <section className="settings-section" aria-labelledby="settings-agent-title">
       <div className="settings-section__header">
@@ -52,26 +60,28 @@ export default function DeveloperAgentSettingsSection({
         className="settings-form settings-form--page"
         onSubmit={onSubmit}
       >
-        <label className="settings-field">
-          <span>{developerAgentLabels.ollamaUrlLabel}</span>
-          <input
-            type="url"
-            value={settings.ollamaUrl}
-            disabled={isSavingSettings || isLoadingSettings}
-            onChange={(event) =>
-              onSettingChange("ollamaUrl", event.target.value)
-            }
-            placeholder={developerAgentLabels.ollamaUrlPlaceholder}
-            spellCheck={false}
-          />
-        </label>
+        <LocalUrlField
+          disabled={isDisabled}
+          label={developerAgentLabels.ollamaUrlLabel}
+          localLabel={settingsLabels.localUrlCheckboxLabel}
+          localValue={localOllamaUrl}
+          placeholder={developerAgentLabels.ollamaUrlPlaceholder}
+          useLocalValue={settings.useLocalOllamaUrl}
+          value={settings.ollamaUrl}
+          onChange={(value) =>
+            onSettingChange("ollamaUrl", value)
+          }
+          onUseLocalValueChange={(value) =>
+            onSettingChange("useLocalOllamaUrl", value)
+          }
+        />
 
         <label className="settings-field">
           <span>{developerAgentLabels.projectPathLabel}</span>
           <input
             type="text"
             value={settings.projectPath}
-            disabled={isSavingSettings || isLoadingSettings}
+            disabled={isDisabled}
             onChange={(event) =>
               onSettingChange("projectPath", event.target.value)
             }
@@ -85,7 +95,7 @@ export default function DeveloperAgentSettingsSection({
           <input
             type="text"
             value={settings.model}
-            disabled={isSavingSettings || isLoadingSettings}
+            disabled={isDisabled}
             onChange={(event) =>
               onSettingChange("model", event.target.value)
             }
@@ -98,7 +108,7 @@ export default function DeveloperAgentSettingsSection({
           <button
             type="submit"
             className="settings-save-button"
-            disabled={isSavingSettings || isLoadingSettings}
+            disabled={isDisabled}
           >
             <Save size={18} />
             <span>

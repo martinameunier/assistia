@@ -14,6 +14,11 @@ import type {
 import type {
   SettingsFeedback
 } from "../../types/launcher";
+import LocalUrlField
+from "./LocalUrlField";
+
+const localSearXNGUrl =
+  "http://127.0.0.1:8888";
 
 type Props = {
   feedback: SettingsFeedback;
@@ -38,6 +43,9 @@ export default function WebSearchSettingsSection({
   onSubmit
 }: Props) {
 
+  const isDisabled =
+    isSavingSettings || isLoadingSettings;
+
   return (
     <section className="settings-section" aria-labelledby="settings-web-search-title">
       <div className="settings-section__header">
@@ -55,7 +63,7 @@ export default function WebSearchSettingsSection({
           <input
             type="checkbox"
             checked={settings.enabled}
-            disabled={isSavingSettings || isLoadingSettings}
+            disabled={isDisabled}
             onChange={(event) =>
               onSettingChange("enabled", event.target.checked)
             }
@@ -63,19 +71,21 @@ export default function WebSearchSettingsSection({
           <span>{labels.webSearchEnabledLabel}</span>
         </label>
 
-        <label className="settings-field">
-          <span>{labels.searxngUrlLabel}</span>
-          <input
-            type="url"
-            value={settings.searxngUrl}
-            disabled={isSavingSettings || isLoadingSettings}
-            onChange={(event) =>
-              onSettingChange("searxngUrl", event.target.value)
-            }
-            placeholder={labels.searxngUrlPlaceholder}
-            spellCheck={false}
-          />
-        </label>
+        <LocalUrlField
+          disabled={isDisabled}
+          label={labels.searxngUrlLabel}
+          localLabel={labels.localUrlCheckboxLabel}
+          localValue={localSearXNGUrl}
+          placeholder={labels.searxngUrlPlaceholder}
+          useLocalValue={settings.useLocalSearxngUrl}
+          value={settings.searxngUrl}
+          onChange={(value) =>
+            onSettingChange("searxngUrl", value)
+          }
+          onUseLocalValueChange={(value) =>
+            onSettingChange("useLocalSearxngUrl", value)
+          }
+        />
 
         <label className="settings-field">
           <span>{labels.webSearchMaxResultsLabel}</span>
@@ -84,7 +94,7 @@ export default function WebSearchSettingsSection({
             min={1}
             max={10}
             value={settings.maxResults}
-            disabled={isSavingSettings || isLoadingSettings}
+            disabled={isDisabled}
             onChange={(event) =>
               onSettingChange(
                 "maxResults",
@@ -98,7 +108,7 @@ export default function WebSearchSettingsSection({
           <button
             type="submit"
             className="settings-save-button"
-            disabled={isSavingSettings || isLoadingSettings}
+            disabled={isDisabled}
           >
             <Save size={18} />
             <span>

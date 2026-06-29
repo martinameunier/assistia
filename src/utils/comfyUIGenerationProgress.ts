@@ -1,5 +1,5 @@
 const comfyUILogPattern =
-  /^\[comfyui\]\s*(.*)$/gim;
+  /^(?:\[comfyui\]\s*)?(.*)$/gim;
 
 export function parseComfyUIGenerationProgress(logs: string) {
 
@@ -11,7 +11,7 @@ export function parseComfyUIGenerationProgress(logs: string) {
       lineMatch[1] ?? "";
 
     const percentMatches =
-      [...line.matchAll(/(\d{1,3}(?:[.,]\d+)?)\s*%\s*\|/g)];
+      [...line.matchAll(/(\d{1,3}(?:[.,]\d+)?)\s*%/g)];
     const lastPercentMatch =
       percentMatches[percentMatches.length - 1];
 

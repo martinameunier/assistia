@@ -1,7 +1,7 @@
 use crate::common::{
     command_output_with_timeout, emit_runtime_log, emit_runtime_status, expand_user_path,
     hide_command_window, read_settings, run_streaming_command, write_settings,
-    DeveloperAgentSettings, LauncherSettings, OPEN_WEBUI_PYTHON_VERSION,
+    DeveloperAgentSettings, LauncherSettings, OLLAMA_BASE_URL, OPEN_WEBUI_PYTHON_VERSION,
 };
 use crate::{installation, python};
 use serde::Serialize;
@@ -39,8 +39,16 @@ pub fn set_developer_agent_settings(
     settings: DeveloperAgentSettings,
 ) -> Result<(), String> {
     let mut launcher_settings: LauncherSettings = read_settings(&app);
+    let use_local_ollama_url = settings.use_local_ollama_url;
+    let ollama_url = if use_local_ollama_url {
+        OLLAMA_BASE_URL.to_string()
+    } else {
+        settings.ollama_url.trim().trim_end_matches('/').to_string()
+    };
+
     launcher_settings.developer_agent = DeveloperAgentSettings {
-        ollama_url: settings.ollama_url.trim().to_string(),
+        use_local_ollama_url,
+        ollama_url,
         project_path: settings.project_path.trim().to_string(),
         model: settings.model.trim().to_string(),
     };

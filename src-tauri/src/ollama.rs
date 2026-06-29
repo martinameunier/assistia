@@ -7,14 +7,18 @@ use crate::common::{
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::io::{Read, Write};
+use std::net::{Shutdown, TcpStream};
 use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Mutex, OnceLock};
 use std::thread;
 use std::time::{Duration, Instant};
 use tauri::AppHandle;
 
 static OLLAMA_PROCESS: OnceLock<Mutex<Option<Child>>> = OnceLock::new();
+static OLLAMA_CHAT_STREAM: OnceLock<Mutex<Option<(u64, TcpStream)>>> = OnceLock::new();
+static OLLAMA_CHAT_REQUEST_COUNTER: AtomicU64 = AtomicU64::new(1);
 
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -47,6 +51,23 @@ struct OllamaApiChatResponse {
 
 fn ollama_process() -> &'static Mutex<Option<Child>> {
     OLLAMA_PROCESS.get_or_init(|| Mutex::new(None))
+}
+
+fn ollama_chat_stream() -> &'static Mutex<Option<(u64, TcpStream)>> {
+    OLLAMA_CHAT_STREAM.get_or_init(|| Mutex::new(None))
+}
+
+fn clear_active_chat_stream(request_id: u64) -> Result<(), String> {
+    let mut stream = ollama_chat_stream().lock().map_err(|e| e.to_string())?;
+
+    if stream
+        .as_ref()
+        .is_some_and(|(active_request_id, _)| *active_request_id == request_id)
+    {
+        *stream = None;
+    }
+
+    Ok(())
 }
 
 fn ollama_executable_name() -> &'static str {
@@ -471,7 +492,8 @@ pub(crate) fn send_chat_message(
         body.len()
     );
 
-    let mut stream = std::net::TcpStream::connect(OLLAMA_API_ADDR).map_err(|e| e.to_string())?;
+    let request_id = OLLAMA_CHAT_REQUEST_COUNTER.fetch_add(1, Ordering::Relaxed);
+    let mut stream = TcpStream::connect(OLLAMA_API_ADDR).map_err(|e| e.to_string())?;
     stream
         .set_read_timeout(Some(Duration::from_secs(300)))
         .map_err(|e| e.to_string())?;
@@ -482,10 +504,18 @@ pub(crate) fn send_chat_message(
         .write_all(request.as_bytes())
         .map_err(|e| e.to_string())?;
 
+    {
+        let mut active_stream = ollama_chat_stream().lock().map_err(|e| e.to_string())?;
+        *active_stream = Some((
+            request_id,
+            stream.try_clone().map_err(|e| e.to_string())?,
+        ));
+    }
+
     let mut response = Vec::new();
-    stream
-        .read_to_end(&mut response)
-        .map_err(|e| e.to_string())?;
+    let read_result = stream.read_to_end(&mut response);
+    clear_active_chat_stream(request_id)?;
+    read_result.map_err(|e| e.to_string())?;
 
     let response_start = String::from_utf8_lossy(&response[..response.len().min(64)]);
 
@@ -515,6 +545,19 @@ pub(crate) fn send_chat_message(
         .unwrap_or_default();
 
     Ok(OllamaChatResponse { message })
+}
+
+pub(crate) fn stop_chat_message() -> Result<bool, String> {
+    let mut stream = ollama_chat_stream().lock().map_err(|e| e.to_string())?;
+    let Some((_, active_stream)) = stream.take() else {
+        return Ok(false);
+    };
+
+    active_stream
+        .shutdown(Shutdown::Both)
+        .map_err(|e| e.to_string())?;
+
+    Ok(true)
 }
 
 pub(crate) fn stop_ollama_runtime(app: &AppHandle) -> Result<String, String> {

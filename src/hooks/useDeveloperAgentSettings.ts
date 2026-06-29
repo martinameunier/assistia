@@ -16,8 +16,12 @@ import type {
 const defaultDeveloperAgentSettings: DeveloperAgentSettings = {
   model: "qwen2.5-coder:7b",
   ollamaUrl: "http://127.0.0.1:11434",
-  projectPath: ""
+  projectPath: "",
+  useLocalOllamaUrl: true
 };
+
+const localOllamaUrl =
+  defaultDeveloperAgentSettings.ollamaUrl;
 
 export function useDeveloperAgentSettings() {
 
@@ -45,7 +49,12 @@ export function useDeveloperAgentSettings() {
           await getDeveloperAgentSettings();
 
         if (isMounted) {
-          setDeveloperAgentSettings(loadedSettings);
+          setDeveloperAgentSettings({
+            ...loadedSettings,
+            ollamaUrl: loadedSettings.useLocalOllamaUrl
+              ? localOllamaUrl
+              : loadedSettings.ollamaUrl
+          });
         }
       } finally {
         if (isMounted) {
@@ -77,9 +86,9 @@ export function useDeveloperAgentSettings() {
     }
   }
 
-  function updateDeveloperAgentSetting(
-    key: keyof DeveloperAgentSettings,
-    value: string
+  function updateDeveloperAgentSetting<Key extends keyof DeveloperAgentSettings>(
+    key: Key,
+    value: DeveloperAgentSettings[Key]
   ) {
 
     setDeveloperAgentSettings((settings) => ({

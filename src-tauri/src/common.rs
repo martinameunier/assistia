@@ -31,6 +31,10 @@ pub(crate) const AIDER_DEFAULT_MODEL: &str = "qwen2.5-coder:7b";
 pub(crate) const SEARXNG_ADDR: &str = "127.0.0.1:8888";
 pub(crate) const DEFAULT_SEARXNG_URL: &str = "http://127.0.0.1:8888";
 
+pub(crate) fn default_true() -> bool {
+    true
+}
+
 #[derive(Serialize)]
 pub struct ServiceStatus {
     pub name: String,
@@ -46,6 +50,8 @@ struct RuntimeProgressEvent {
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(default, rename_all = "camelCase")]
 pub(crate) struct DeveloperAgentSettings {
+    #[serde(default = "default_true")]
+    pub(crate) use_local_ollama_url: bool,
     pub(crate) ollama_url: String,
     pub(crate) project_path: String,
     pub(crate) model: String,
@@ -54,6 +60,7 @@ pub(crate) struct DeveloperAgentSettings {
 impl Default for DeveloperAgentSettings {
     fn default() -> Self {
         Self {
+            use_local_ollama_url: true,
             ollama_url: OLLAMA_BASE_URL.to_string(),
             project_path: String::new(),
             model: AIDER_DEFAULT_MODEL.to_string(),
@@ -63,8 +70,27 @@ impl Default for DeveloperAgentSettings {
 
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(default, rename_all = "camelCase")]
+pub(crate) struct ImageGeneratorSettings {
+    #[serde(default = "default_true")]
+    pub(crate) use_local_comfyui_url: bool,
+    pub(crate) comfyui_url: String,
+}
+
+impl Default for ImageGeneratorSettings {
+    fn default() -> Self {
+        Self {
+            use_local_comfyui_url: true,
+            comfyui_url: COMFYUI_URL.to_string(),
+        }
+    }
+}
+
+#[derive(Clone, Deserialize, Serialize)]
+#[serde(default, rename_all = "camelCase")]
 pub(crate) struct WebSearchSettings {
     pub(crate) enabled: bool,
+    #[serde(default = "default_true")]
+    pub(crate) use_local_searxng_url: bool,
     pub(crate) searxng_url: String,
     pub(crate) max_results: usize,
 }
@@ -73,6 +99,7 @@ impl Default for WebSearchSettings {
     fn default() -> Self {
         Self {
             enabled: false,
+            use_local_searxng_url: true,
             searxng_url: DEFAULT_SEARXNG_URL.to_string(),
             max_results: 5,
         }
@@ -97,6 +124,8 @@ pub(crate) struct LauncherSettings {
     pub(crate) chat_history_security: ChatHistorySecuritySettings,
     #[serde(default)]
     pub(crate) developer_agent: DeveloperAgentSettings,
+    #[serde(default)]
+    pub(crate) image_generator: ImageGeneratorSettings,
     #[serde(default)]
     pub(crate) web_search: WebSearchSettings,
 }

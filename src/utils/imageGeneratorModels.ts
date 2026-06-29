@@ -1114,6 +1114,36 @@ function replaceAttributeValue(
   }, 0);
 }
 
+function randomSeed() {
+
+  return Math.floor(Math.random() * 1_000_000_000_000_000);
+}
+
+function randomizeSeedValues(target: unknown) {
+
+  if (Array.isArray(target)) {
+    for (const item of target) {
+      randomizeSeedValues(item);
+    }
+
+    return;
+  }
+
+  if (!isRecord(target)) {
+    return;
+  }
+
+  for (const [key, value] of Object.entries(target)) {
+    if ((key === "seed" || key === "noise_seed") && typeof value === "number") {
+      target[key] =
+        randomSeed();
+      continue;
+    }
+
+    randomizeSeedValues(value);
+  }
+}
+
 export function buildWorkflowForPrompt(
   model: ImageGeneratorModel,
   prompt: string
@@ -1157,6 +1187,8 @@ export function buildWorkflowForPrompt(
       throw new Error(`Attribut prompt introuvable: ${promptAttribute}`);
     }
   }
+
+  randomizeSeedValues(workflow);
 
   return workflow;
 }

@@ -16,8 +16,12 @@ import type {
 const defaultWebSearchSettings: WebSearchSettings = {
   enabled: false,
   maxResults: 5,
-  searxngUrl: "http://127.0.0.1:8888"
+  searxngUrl: "http://127.0.0.1:8888",
+  useLocalSearxngUrl: true
 };
+
+const localSearXNGUrl =
+  defaultWebSearchSettings.searxngUrl;
 
 export function useWebSearchSettings() {
 
@@ -45,7 +49,12 @@ export function useWebSearchSettings() {
           await getWebSearchSettings();
 
         if (isMounted) {
-          setWebSearchSettings(loadedSettings);
+          setWebSearchSettings({
+            ...loadedSettings,
+            searxngUrl: loadedSettings.useLocalSearxngUrl
+              ? localSearXNGUrl
+              : loadedSettings.searxngUrl
+          });
         }
       } finally {
         if (isMounted) {

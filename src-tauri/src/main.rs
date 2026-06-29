@@ -217,11 +217,25 @@ async fn send_ollama_chat_message(
 }
 
 #[tauri::command]
+async fn stop_ollama_chat_message() -> Result<bool, String> {
+    tauri::async_runtime::spawn_blocking(ollama::stop_chat_message)
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+#[tauri::command]
 async fn queue_comfyui_image_generation(
     app: tauri::AppHandle,
     workflow: serde_json::Value,
 ) -> Result<comfyui::ComfyUIImageGenerationResponse, String> {
     tauri::async_runtime::spawn_blocking(move || comfyui::queue_image_generation(&app, workflow))
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+#[tauri::command]
+async fn interrupt_comfyui_image_generation(app: tauri::AppHandle) -> Result<bool, String> {
+    tauri::async_runtime::spawn_blocking(move || comfyui::interrupt_image_generation(&app))
         .await
         .map_err(|e| e.to_string())?
 }
@@ -291,13 +305,14 @@ fn open_webui() -> Result<(), String> {
 }
 
 #[tauri::command]
-fn open_comfyui() -> Result<(), String> {
-    open::that("http://127.0.0.1:8188").map_err(|e| e.to_string())
+fn open_comfyui(app: tauri::AppHandle) -> Result<(), String> {
+    let settings = read_settings(&app).image_generator;
+    open::that(settings.comfyui_url).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 fn open_documentation() -> Result<(), String> {
-    open::that("https://assistia.martinameunier.fr").map_err(|e| e.to_string())
+    open::that("https://assistia.martinameunier.fr/documentation").map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -362,6 +377,8 @@ fn main() {
             send_developer_agent_message,
             get_web_search_settings,
             set_web_search_settings,
+            comfyui::get_image_generator_settings,
+            comfyui::set_image_generator_settings,
             search_web,
             open_webui,
             open_comfyui,
@@ -386,7 +403,9 @@ fn main() {
             pull_ollama_model,
             delete_ollama_model,
             send_ollama_chat_message,
+            stop_ollama_chat_message,
             queue_comfyui_image_generation,
+            interrupt_comfyui_image_generation,
             save_comfyui_generated_image
         ])
         .build(tauri::generate_context!())

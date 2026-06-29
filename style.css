@@ -697,6 +697,90 @@ textarea {
   justify-content: flex-end;
 }
 
+.image-generator-history {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  border-radius: 10px;
+  background: #ffffff;
+  display: grid;
+  gap: 12px;
+}
+
+.image-generator-history__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.image-generator-history__header h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 0.98rem;
+  line-height: 1.25;
+}
+
+.image-generator-history__list {
+  min-width: 0;
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.image-generator-history__item {
+  flex: 0 0 min(280px, 82vw);
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.image-generator-history__item img {
+  width: 78px;
+  height: 78px;
+  border: 1px solid rgba(148, 163, 184, 0.36);
+  border-radius: 8px;
+  background: #0f172a;
+  object-fit: cover;
+}
+
+.image-generator-history__meta {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 5px;
+}
+
+.image-generator-history__meta strong {
+  color: #0f172a;
+  font-size: 0.86rem;
+  line-height: 1.25;
+}
+
+.image-generator-history__meta span {
+  color: #475569;
+  display: -webkit-box;
+  font-size: 0.78rem;
+  font-weight: 750;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.image-generator-history__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .module-actions {
   display: flex;
   flex-wrap: wrap;
@@ -851,6 +935,8 @@ textarea {
 }
 
 .chat-page {
+  height: clamp(520px, calc(100vh - 210px), 760px);
+  height: clamp(520px, calc(100dvh - 210px), 760px);
   grid-template-rows: auto auto minmax(0, 1fr);
 }
 
@@ -1109,6 +1195,20 @@ textarea {
   color: #475569;
 }
 
+.chat-generated-image {
+  width: min(100%, 640px);
+  max-height: 520px;
+  border: 1px solid rgba(148, 163, 184, 0.36);
+  border-radius: 10px;
+  background: #0f172a;
+  object-fit: contain;
+}
+
+.chat-generated-image__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .chat-thinking-dot {
   width: 16px;
   height: 16px;
@@ -1238,29 +1338,55 @@ textarea {
   background: var(--color-access-hover);
 }
 
+.developer-agent-composer .chat-composer__send-button--stop {
+  background: var(--color-stop);
+}
+
+.developer-agent-composer .chat-composer__send-button--stop:hover:not(:disabled) {
+  background: var(--color-stop-hover);
+}
+
 .developer-agent-composer button:disabled {
   cursor: not-allowed;
   opacity: 0.54;
 }
 
 .chat-composer {
-  grid-template-columns: 46px minmax(0, 1fr) 46px;
+  grid-template-columns: minmax(0, 1fr) 46px;
 }
 
-.developer-agent-composer .chat-composer__web-toggle {
+.chat-composer textarea {
+  min-height: 72px;
+  max-height: min(42dvh, 380px);
+  resize: none;
+  overflow-y: auto;
+}
+
+.chat-composer__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.developer-agent-composer .chat-composer__web-toggle,
+.developer-agent-composer .chat-composer__image-toggle {
   border: 1px solid #cbd5e1;
   background: #ffffff;
   color: #475569;
 }
 
-.developer-agent-composer .chat-composer__web-toggle:hover:not(:disabled) {
+.developer-agent-composer .chat-composer__web-toggle:hover:not(:disabled),
+.developer-agent-composer .chat-composer__image-toggle:hover:not(:disabled) {
   border-color: #93c5fd;
   background: #eff6ff;
   color: #1d4ed8;
 }
 
 .developer-agent-composer .chat-composer__web-toggle--active,
-.developer-agent-composer .chat-composer__web-toggle--active:hover:not(:disabled) {
+.developer-agent-composer .chat-composer__web-toggle--active:hover:not(:disabled),
+.developer-agent-composer .chat-composer__image-toggle--active,
+.developer-agent-composer .chat-composer__image-toggle--active:hover:not(:disabled) {
   border-color: #2563eb;
   background: #dbeafe;
   color: #1d4ed8;
@@ -1345,6 +1471,7 @@ textarea {
 .settings-icon-button:focus-visible,
 .settings-save-button:focus-visible,
 .settings-field input:focus-visible,
+.settings-field select:focus-visible,
 .settings-checkbox-field input:focus-visible,
 .missing-components-dialog__item input:focus-visible,
 .missing-components-dialog__startup-check input:focus-visible,
@@ -1420,6 +1547,11 @@ textarea {
   justify-content: center;
 }
 
+.settings-icon-button--danger {
+  border-color: rgba(220, 38, 38, 0.3);
+  color: var(--color-stop);
+}
+
 .settings-form {
   padding: 20px;
   display: grid;
@@ -1456,13 +1588,26 @@ textarea {
   accent-color: var(--color-access);
 }
 
+.settings-checkbox-field--compact {
+  min-height: 36px;
+  padding: 7px 10px;
+  font-size: 0.82rem;
+}
+
+.settings-checkbox-field--compact input {
+  width: 16px;
+  height: 16px;
+}
+
 .settings-checkbox-field:has(input:disabled) {
   background: #f1f5f9;
   color: #64748b;
   cursor: wait;
 }
 
-.settings-field input {
+.settings-field input,
+.settings-field select,
+.settings-url-field input[type="url"] {
   width: 100%;
   box-sizing: border-box;
   padding: 11px 12px;
@@ -1470,14 +1615,36 @@ textarea {
   border-radius: 10px;
   background: #ffffff;
   color: #0f172a;
-  font: 0.88rem ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font: inherit;
+  font-size: 0.9rem;
   line-height: 1.35;
 }
 
-.settings-field input:disabled {
+.settings-field input:disabled,
+.settings-field select:disabled,
+.settings-url-field input[type="url"]:disabled {
   cursor: wait;
   background: #f1f5f9;
   color: #64748b;
+}
+
+.settings-url-field {
+  display: grid;
+  gap: 8px;
+  color: #0f172a;
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.settings-url-field__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings-url-field__label {
+  min-width: 0;
 }
 
 .settings-field__hint {
@@ -1659,6 +1826,13 @@ textarea {
   box-shadow: 0 18px 44px rgba(2, 6, 23, 0.2);
   display: grid;
   gap: 16px;
+}
+
+.settings-choice-panel {
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
 }
 
 .settings-section__header {
@@ -1957,6 +2131,11 @@ textarea {
   padding: 20px;
   display: grid;
   gap: 14px;
+}
+
+.missing-components-dialog__body {
+  min-height: 0;
+  overflow: auto;
 }
 
 .ollama-install-dialog__body p {
@@ -2478,6 +2657,11 @@ textarea {
     flex-basis: 100%;
   }
 
+  .settings-url-field__header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
   .developer-agent-message {
     max-width: 100%;
     grid-template-columns: 30px minmax(0, 1fr);
@@ -2566,7 +2750,7 @@ textarea {
   }
 
   .chat-composer {
-    grid-template-columns: 42px minmax(0, 1fr) 42px;
+    grid-template-columns: minmax(0, 1fr) 42px;
   }
 
   .developer-agent-composer button {

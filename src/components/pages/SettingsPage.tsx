@@ -7,6 +7,7 @@ from "../../i18n";
 import {
   type ChatHistorySecurityState,
   type DeveloperAgentSettings,
+  type ImageGeneratorSettings,
   type ImageGeneratorModelAvailability,
   type WebSearchSettings
 } from "../../services/tauris";
@@ -29,6 +30,8 @@ import ChatModelsSection
 from "../settings/ChatModelsSection";
 import ImageModelsSection
 from "../settings/ImageModelsSection";
+import ImageGeneratorSettingsSection
+from "../settings/ImageGeneratorSettingsSection";
 import DeveloperAgentSettingsSection
 from "../settings/DeveloperAgentSettingsSection";
 import WebSearchSettingsSection
@@ -40,9 +43,12 @@ type Props = {
   chatHistorySecurityState: ChatHistorySecurityState;
   chatModelAction: ChatModelAction;
   chatModelActionFeedback: ChatModelActionFeedback;
+  chatImageModelName: string;
   chatModels: ChatModel[];
   developerAgentSettings: DeveloperAgentSettings;
   developerAgentSettingsFeedback: SettingsFeedback;
+  imageGeneratorSettings: ImageGeneratorSettings;
+  imageGeneratorSettingsFeedback: SettingsFeedback;
   imageModelAction: ImageGeneratorModelAction;
   imageModelActionFeedback: ImageGeneratorModelActionFeedback;
   imageModelAvailability: ImageGeneratorModelAvailability[];
@@ -56,9 +62,11 @@ type Props = {
   isLoadingChatModels: boolean;
   isLoadingChatHistorySecurity: boolean;
   isLoadingImageModels: boolean;
+  isLoadingImageGeneratorSettings: boolean;
   isOllamaInstalled: boolean;
   isRequiredComponentsInstalled: boolean;
   isSavingDeveloperAgentSettings: boolean;
+  isSavingImageGeneratorSettings: boolean;
   isLoadingWebSearchSettings: boolean;
   isSavingWebSearchSettings: boolean;
   labels: Translations;
@@ -66,14 +74,19 @@ type Props = {
   pendingInstallationAction: PendingInstallationAction;
   webSearchSettings: WebSearchSettings;
   webSearchSettingsFeedback: SettingsFeedback;
-  onDeveloperAgentSettingChange: (
-    key: keyof DeveloperAgentSettings,
-    value: string
+  onDeveloperAgentSettingChange: <Key extends keyof DeveloperAgentSettings>(
+    key: Key,
+    value: DeveloperAgentSettings[Key]
+  ) => void;
+  onImageGeneratorSettingChange: <Key extends keyof ImageGeneratorSettings>(
+    key: Key,
+    value: ImageGeneratorSettings[Key]
   ) => void;
   onWebSearchSettingChange: <Key extends keyof WebSearchSettings>(
     key: Key,
     value: WebSearchSettings[Key]
   ) => void;
+  onChatImageModelChange: (modelName: string) => void;
   onDeleteChatModel: (model: ChatModel) => void;
   onDeleteImageModel: (model: ImageGeneratorModel) => void;
   onChangeChatHistoryPassword: (
@@ -88,6 +101,7 @@ type Props = {
   onInstallRequiredComponents: () => void;
   onInstallWebSearch: () => void;
   onSaveDeveloperAgentSettings: (event: FormEvent<HTMLFormElement>) => void;
+  onSaveImageGeneratorSettings: (event: FormEvent<HTMLFormElement>) => void;
   onSaveWebSearchSettings: (event: FormEvent<HTMLFormElement>) => void;
 };
 
@@ -95,9 +109,12 @@ export default function SettingsPage({
   chatHistorySecurityState,
   chatModelAction,
   chatModelActionFeedback,
+  chatImageModelName,
   chatModels,
   developerAgentSettings,
   developerAgentSettingsFeedback,
+  imageGeneratorSettings,
+  imageGeneratorSettingsFeedback,
   imageModelAction,
   imageModelActionFeedback,
   imageModelAvailability,
@@ -111,17 +128,21 @@ export default function SettingsPage({
   isLoadingChatModels,
   isLoadingChatHistorySecurity,
   isLoadingImageModels,
+  isLoadingImageGeneratorSettings,
   isLoadingWebSearchSettings,
   isOllamaInstalled,
   isRequiredComponentsInstalled,
   isSavingDeveloperAgentSettings,
+  isSavingImageGeneratorSettings,
   isSavingWebSearchSettings,
   labels,
   logs,
   pendingInstallationAction,
   webSearchSettings,
   webSearchSettingsFeedback,
+  onChatImageModelChange,
   onDeveloperAgentSettingChange,
+  onImageGeneratorSettingChange,
   onWebSearchSettingChange,
   onDeleteChatModel,
   onDeleteImageModel,
@@ -134,6 +155,7 @@ export default function SettingsPage({
   onInstallRequiredComponents,
   onInstallWebSearch,
   onSaveDeveloperAgentSettings,
+  onSaveImageGeneratorSettings,
   onSaveWebSearchSettings
 }: Props) {
 
@@ -174,6 +196,7 @@ export default function SettingsPage({
       />
 
       <ImageModelsSection
+        chatImageModelName={chatImageModelName}
         imageModelAction={imageModelAction}
         imageModelActionFeedback={imageModelActionFeedback}
         imageModelAvailability={imageModelAvailability}
@@ -182,8 +205,19 @@ export default function SettingsPage({
         isLoadingImageModels={isLoadingImageModels}
         labels={settingsLabels}
         logs={logs}
+        onChatImageModelChange={onChatImageModelChange}
         onDeleteImageModel={onDeleteImageModel}
         onDownloadImageModel={onDownloadImageModel}
+      />
+
+      <ImageGeneratorSettingsSection
+        feedback={imageGeneratorSettingsFeedback}
+        isLoadingSettings={isLoadingImageGeneratorSettings}
+        isSavingSettings={isSavingImageGeneratorSettings}
+        labels={settingsLabels}
+        settings={imageGeneratorSettings}
+        onSettingChange={onImageGeneratorSettingChange}
+        onSubmit={onSaveImageGeneratorSettings}
       />
 
       <DeveloperAgentSettingsSection

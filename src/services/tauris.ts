@@ -9,6 +9,7 @@ export type DeveloperAgentSettings = {
   model: string;
   ollamaUrl: string;
   projectPath: string;
+  useLocalOllamaUrl: boolean;
 };
 
 export type DeveloperAgentResponse = {
@@ -22,7 +23,13 @@ export type DeveloperAgentResponse = {
 export type WebSearchSettings = {
   enabled: boolean;
   searxngUrl: string;
+  useLocalSearxngUrl: boolean;
   maxResults: number;
+};
+
+export type ImageGeneratorSettings = {
+  comfyuiUrl: string;
+  useLocalComfyuiUrl: boolean;
 };
 
 export type WebSearchResult = {
@@ -337,6 +344,11 @@ export async function sendOllamaChatMessage(
   });
 }
 
+export async function stopOllamaChatMessage() {
+
+  return await invoke<boolean>("stop_ollama_chat_message");
+}
+
 export async function queueComfyUIImageGeneration(workflow: unknown) {
 
   return await invoke<ComfyUIImageGenerationResponse>(
@@ -345,6 +357,11 @@ export async function queueComfyUIImageGeneration(workflow: unknown) {
       workflow
     }
   );
+}
+
+export async function interruptComfyUIImageGeneration() {
+
+  return await invoke<boolean>("interrupt_comfyui_image_generation");
 }
 
 export async function saveComfyUIGeneratedImage(
@@ -386,6 +403,18 @@ export async function getDeveloperAgentSettings() {
 export async function setDeveloperAgentSettings(settings: DeveloperAgentSettings) {
 
   await invoke("set_developer_agent_settings", {
+    settings
+  });
+}
+
+export async function getImageGeneratorSettings() {
+
+  return await invoke<ImageGeneratorSettings>("get_image_generator_settings");
+}
+
+export async function setImageGeneratorSettings(settings: ImageGeneratorSettings) {
+
+  await invoke("set_image_generator_settings", {
     settings
   });
 }

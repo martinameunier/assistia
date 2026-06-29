@@ -1,14 +1,18 @@
 # Assistia
 
-Assistia est une application desktop Tauri + React pour installer, demarrer et piloter un environnement IA local avec Ollama, Open WebUI et ComfyUI.
+Assistia est une application desktop Tauri + React pour installer, demarrer et piloter un environnement IA local avec Ollama, Open WebUI, ComfyUI, Aider et SearXNG.
+
+Le depot contient aussi le site public d'Assistia, la documentation fonctionnelle, la documentation technique, une page de telechargement des installateurs et une galerie d'images, le tout deployable avec Docker et Apache.
 
 L'application lance les services localement sur la machine de l'utilisateur :
 
 - Ollama expose son API sur <http://127.0.0.1:11434>.
 - Open WebUI expose son interface sur <http://127.0.0.1:8080>.
 - ComfyUI expose son interface sur <http://127.0.0.1:8188>.
+- SearXNG expose son service local sur <http://127.0.0.1:8888> quand la recherche web est activee.
 - Open WebUI est connecte a Ollama avec `OLLAMA_BASE_URL=http://127.0.0.1:11434`.
 - Le modele prepare par Assistia est `qwen3:4b`.
+- L'agent developpeur Aider utilise `qwen2.5-coder:7b` par defaut.
 
 ## Fonctionnement general
 
@@ -22,7 +26,10 @@ Au lancement, Assistia sait :
 - telecharger ou verifier le modele `qwen3:4b` avec `ollama pull qwen3:4b` ;
 - preparer Open WebUI dans un environnement Python local si necessaire ;
 - lancer Open WebUI avec `open-webui serve --host 127.0.0.1 --port 8080` ;
-- preparer et lancer ComfyUI depuis la page `Generateur d'image`.
+- preparer et lancer ComfyUI depuis la page `Generateur d'image` ;
+- preparer Aider pour l'agent developpeur ;
+- preparer et lancer SearXNG pour la recherche web ;
+- verrouiller les URL locales d'Ollama, ComfyUI et SearXNG quand les options locales sont cochees.
 
 ## Prerequis de developpement
 
@@ -95,6 +102,44 @@ npm run dev
 ```
 
 L'interface Vite est alors disponible sur <http://localhost:5173>.
+
+## Site vitrine et documentation
+
+Le site statique est regroupe dans `site-documentaire`. Il est servi par Apache depuis l'image Docker definie dans `site-documentaire/Dockerfile`.
+
+Contenu principal :
+
+- `site-documentaire/index.html` : presentation du logiciel Assistia ;
+- `site-documentaire/telechargements.html` : page de telechargement des installateurs ;
+- `site-documentaire/galerie.html` : galerie avec carrousel d'images ;
+- `site-documentaire/documentation/` : documentation fonctionnelle en francais et en anglais ;
+- `site-documentaire/documentation-technique/` : documentation technique ;
+- `site-documentaire/installateurs/mac/` et `site-documentaire/installateurs/windows/` : installateurs publies sur le site ;
+- `site-documentaire/images/galerie/` : images affichees dans la galerie.
+
+Le menu public est mutualise dans `site-documentaire/menu.html`. Les pages HTML l'incluent avec Apache SSI, donc il faut tester le site via Apache ou Docker pour voir le menu rendu correctement.
+
+Pour tester localement :
+
+```bash
+cd site-documentaire
+docker compose up -d --build
+```
+
+Le site est alors disponible sur <http://localhost/>.
+
+Le Dockerfile copie les pages publiques, les deux documentations, les installateurs, les images, le favicon, `robots.txt` et `sitemap.xml` dans Apache. La configuration `httpd-cache.conf` active les includes SSI, les redirections canoniques, les droits de lecture et les en-tetes de cache adaptes aux fichiers statiques.
+
+Le referencement est prepare avec :
+
+- balises `title` et `meta description` sur les pages publiques ;
+- liens canoniques ;
+- metadonnees Open Graph et Twitter ;
+- donnees structurees JSON-LD ;
+- `robots.txt` ;
+- `sitemap.xml`.
+
+La page d'accueil de la documentation contient aussi les liens publics vers le projet GitHub <https://github.com/martinameunier/assistia> et vers Patreon <https://www.patreon.com/cw/MartinAMeunier>.
 
 ## Installation d'Ollama
 
@@ -191,6 +236,32 @@ La page `Generateur d'image` permet d'installer, demarrer, ouvrir et arreter le 
 
 Documentation officielle ComfyUI : <https://github.com/Comfy-Org/ComfyUI>
 
+## Agent developpeur Aider
+
+Assistia peut preparer un agent developpeur local base sur Aider.
+
+Depuis le menu `Parametrage`, l'installation des composants manquants prepare aussi Aider si l'agent developpeur est absent. L'application :
+
+- prepare un dossier local dans les donnees applicatives d'Assistia ;
+- verifie ou installe Python 3.11 via `uv` ;
+- cree un environnement Python local ;
+- installe `aider-chat` dans cet environnement ;
+- conserve l'historique de l'agent dans les donnees applicatives.
+
+L'agent utilise l'URL Ollama configuree dans les parametres. Par defaut, la case `Utiliser l'adresse locale` force `http://127.0.0.1:11434` et verrouille le champ d'URL pour eviter les modifications accidentelles.
+
+## Recherche web SearXNG
+
+Assistia peut preparer SearXNG dans un environnement Python local pour fournir une recherche web controlable depuis l'application.
+
+Quand SearXNG est installe et lance par Assistia, il ecoute par defaut sur :
+
+```bash
+http://127.0.0.1:8888
+```
+
+La recherche web peut etre activee ou desactivee dans les parametres. La case `Utiliser l'adresse locale` force l'URL locale SearXNG et verrouille le champ d'URL. Si vous voulez utiliser une instance distante, decochez cette case puis renseignez une URL `http://` ou `https://`.
+
 ## Parametrage dans l'application
 
 Le bouton `Parametrage` se trouve en bas a droite de la fenetre.
@@ -199,9 +270,21 @@ Le menu contient :
 
 - `Chemin vers Ollama` : chemin complet vers l'executable Ollama ou vers le dossier qui le contient.
 - `Chemin vers Open WebUI` : chemin complet vers l'executable Open WebUI ou vers le dossier qui le contient.
+- `URL Ollama` pour l'agent developpeur Aider.
+- `URL ComfyUI` pour le generateur d'image.
+- `URL SearXNG` pour la recherche web.
+- une case `Utiliser l'adresse locale` pour chaque URL locale.
 - `Installer les composants manquants` : bouton unique qui installe uniquement ce qui manque.
 
-Si les chemins sont vides, Assistia utilise la detection automatique. Pour Open WebUI, Assistia privilegie son installation locale geree si aucun chemin personnalise n'est fourni. Pour ComfyUI, Assistia utilise son installation locale geree.
+Si les chemins sont vides, Assistia utilise la detection automatique. Pour Open WebUI, Assistia privilegie son installation locale geree si aucun chemin personnalise n'est fourni. Pour ComfyUI, Aider et SearXNG, Assistia utilise ses installations locales gerees.
+
+Quand une case `Utiliser l'adresse locale` est cochee, Assistia force l'adresse par defaut du composant et verrouille le champ correspondant :
+
+- Ollama : `http://127.0.0.1:11434` ;
+- ComfyUI : `http://127.0.0.1:8188` ;
+- SearXNG : `http://127.0.0.1:8888`.
+
+Pour utiliser un service distant ou une URL personnalisee, decochez la case locale puis renseignez l'adresse voulue.
 
 ## Demarrage des services
 
@@ -220,7 +303,11 @@ Le bouton `Ouvrir Open WebUI` ouvre l'interface web quand elle est disponible.
 
 La page `Generateur d'image` lance ComfyUI separement sur <http://127.0.0.1:8188>.
 
-Le bouton `Patreon`, en bas a gauche, ouvre <https://www.patreon.com/c/MartinAMeunier>.
+L'agent developpeur lance Aider a la demande avec l'URL Ollama configuree.
+
+La recherche web utilise SearXNG si elle est activee dans les parametres.
+
+Le site public et la documentation pointent vers GitHub <https://github.com/martinameunier/assistia> et Patreon <https://www.patreon.com/cw/MartinAMeunier>.
 
 ## Construire l'application
 
@@ -232,6 +319,78 @@ npm run tauri build
 
 Le resultat de compilation se trouve dans `src-tauri/target/release/bundle/`.
 
+## Builds et deploiement
+
+Les scripts de release automatisent la creation des installateurs, la collecte des artefacts et le deploiement du site public sur le serveur.
+
+```bash
+npm run release:build
+```
+
+Tauri genere des bundles natifs : lancez cette commande sur macOS pour le `.dmg`, sur Windows pour les installateurs Windows, et sur Linux pour les paquets Linux. Les artefacts detectes sont copies dans `dist-release/artifacts/<plateforme>/`.
+
+Les installateurs affiches sur le site peuvent ensuite etre places dans :
+
+- `site-documentaire/installateurs/mac/` ;
+- `site-documentaire/installateurs/windows/` ;
+- `site-documentaire/installateurs/linux/` si une page Linux est ajoutee plus tard.
+
+Pour configurer le serveur :
+
+```bash
+cp scripts/release-deploy.env.example .env.release
+set -a && source .env.release && set +a
+```
+
+Puis deployez le site et les artefacts deja collectes :
+
+```bash
+npm run release:deploy
+```
+
+Pour tout faire depuis la plateforme courante :
+
+```bash
+npm run release
+```
+
+Commandes utiles :
+
+```bash
+npm run release:check
+npm run release -- --skip-build --require-all-platforms
+TAURI_BUILD_ARGS=--no-sign npm run release:build
+```
+
+`npm run release:check` verifie les liens locaux du site statique, la configuration Docker Compose de `site-documentaire` et la presence des artefacts macOS, Windows et Linux. Sans l'option `--require-all-platforms`, les artefacts manquants produisent seulement un avertissement.
+
+### Mettre a jour uniquement la documentation
+
+Depuis le Mac qui possede la cle SSH du serveur, utilisez le script dedie :
+
+```bash
+cp scripts/deploy-documentation.env.example .env.documentation
+set -a && source .env.documentation && set +a
+npm run documentation:deploy
+```
+
+Le script est volontairement limite a macOS. Il depose `site-documentaire` avec `sftp`, se connecte ensuite en SSH, remplace le dossier distant puis relance Docker Compose.
+
+Par defaut, le redemarrage distant execute l'equivalent de :
+
+```bash
+docker compose down
+docker compose up -d --build
+```
+
+Le `--build` est utile car le site est copie dans l'image Apache par le Dockerfile. Pour utiliser l'ancien binaire Compose, renseignez `DOC_COMPOSE_CMD=docker-compose`. Pour lancer strictement `docker compose up -d`, renseignez `DOC_COMPOSE_UP_ARGS=-d`.
+
+Un essai sans action distante est possible avec :
+
+```bash
+npm run documentation:deploy -- --dry-run
+```
+
 ## References
 
 - Tauri v2 prerequisites : <https://v2.tauri.app/start/prerequisites/>
@@ -239,6 +398,8 @@ Le resultat de compilation se trouve dans `src-tauri/target/release/bundle/`.
 - Ollama CLI : <https://docs.ollama.com/cli>
 - Open WebUI : <https://docs.openwebui.com/>
 - ComfyUI : <https://github.com/Comfy-Org/ComfyUI>
+- Aider : <https://github.com/Aider-AI/aider>
+- SearXNG : <https://github.com/searxng/searxng>
 - uv : <https://docs.astral.sh/uv/>
 - Node.js : <https://nodejs.org/>
 - Rust : <https://www.rust-lang.org/tools/install>
@@ -247,4 +408,4 @@ Le resultat de compilation se trouve dans `src-tauri/target/release/bundle/`.
 
 Assistia est distribue sous une licence proprietaire limitee aux usages non commerciaux. Consultez [LICENSE.md](LICENSE.md) pour les conditions completes.
 
-L'utilisation d'Assistia reste egalement soumise au respect des licences et conditions applicables a Ollama, Open WebUI, ComfyUI, aux bibliotheques tierces et aux modeles telecharges ou utilises.
+L'utilisation d'Assistia reste egalement soumise au respect des licences et conditions applicables a Ollama, Open WebUI, ComfyUI, Aider, SearXNG, aux bibliotheques tierces et aux modeles telecharges ou utilises.

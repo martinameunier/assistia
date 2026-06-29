@@ -124,12 +124,77 @@
       ]
     },
     "workflowPath": "workflows/flux1-dev-fp8.json",
-    "promptAttributeName": "6.inputs.text",
+    "promptAttributeName": "56:51.inputs.text",
     "downloads": [
       {
-        "url": "https://huggingface.co/Comfy-Org/flux1-dev/resolve/main/flux1-dev-fp8.safetensors",
-        "destinationDirectory": "checkpoints",
-        "fileName": "flux1-dev-fp8.safetensors"
+        "url": "https://huggingface.co/Comfy-Org/flux1-dev/resolve/main/flux1-dev.safetensors",
+        "destinationDirectory": "diffusion_models",
+        "fileName": "flux1-dev.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors",
+        "destinationDirectory": "text_encoders",
+        "fileName": "clip_l.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp16.safetensors",
+        "destinationDirectory": "text_encoders",
+        "fileName": "t5xxl_fp16.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/Comfy-Org/Lumina_Image_2.0_Repackaged/resolve/main/split_files/vae/ae.safetensors",
+        "destinationDirectory": "vae",
+        "fileName": "ae.safetensors"
+      }
+    ]
+  },
+  {
+    "name": "FLUX.1 Dev",
+    "description": "Modèle Flux.1 Dev pour ComfyUI, plus qualitatif que Schnell mais reserve aux usages autorises par sa licence non commerciale.",
+    "architecture": "Flux",
+    "recommendedMemory": "GPU 12 Go+ conseille, 16 Go+ plus confortable",
+    "tags": [
+      "diffusion-model",
+      "non-commercial",
+      "1024px"
+    ],
+    "notes": [
+      "Version Flux Dev avec modele de diffusion, encodeurs texte et VAE separes.",
+      "Reglage CFG 1.0 recommande pour Flux."
+    ],
+    "license": {
+      "name": "FLUX.1 [dev] Non-Commercial License",
+      "url": "https://huggingface.co/Comfy-Org/flux1-dev",
+      "summary": "Licence non commerciale pour Flux Dev. Elle permet l'experimentation locale mais limite les usages commerciaux.",
+      "usage": "Usage local, recherche, tests et creation non commerciale, sous reserve du respect de la licence Flux Dev.",
+      "restrictions": [
+        "Usage commercial non autorise sans licence adaptee.",
+        "Respecter les restrictions de la licence Black Forest Labs Flux Dev.",
+        "L'utilisateur reste responsable des contenus generes et du respect des droits de tiers."
+      ]
+    },
+    "workflowPath": "workflows/flux1-dev.json",
+    "promptAttributeName": "194:49.inputs.text",
+    "downloads": [
+      {
+        "url": "https://huggingface.co/Comfy-Org/flux1-dev/resolve/main/flux1-dev.safetensors",
+        "destinationDirectory": "diffusion_models",
+        "fileName": "flux1-dev.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors",
+        "destinationDirectory": "text_encoders",
+        "fileName": "clip_l.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp16.safetensors",
+        "destinationDirectory": "text_encoders",
+        "fileName": "t5xxl_fp16.safetensors"
+      },
+      {
+        "url": "https://huggingface.co/Comfy-Org/Lumina_Image_2.0_Repackaged/resolve/main/split_files/vae/ae.safetensors",
+        "destinationDirectory": "vae",
+        "fileName": "ae.safetensors"
       }
     ]
   },

@@ -1,8 +1,8 @@
 use crate::common::{
     command_output_with_timeout, emit_runtime_log, emit_runtime_status, ensure_curl,
-    hide_command_window, kill_matching_processes, kill_process_tree, run_streaming_command,
-    stream_command_output, tcp_service_ready, wait_until_tcp_service_stops, COMFYUI_ADDR,
-    COMFYUI_URL,
+    hide_command_window, kill_matching_processes, kill_process_tree, read_settings,
+    run_streaming_command, stream_command_output, tcp_service_ready, wait_until_tcp_service_stops,
+    write_settings, ImageGeneratorSettings, LauncherSettings, COMFYUI_ADDR, COMFYUI_URL,
 };
 use base64::{engine::general_purpose, Engine as _};
 use serde::{Deserialize, Serialize};
@@ -11,12 +11,14 @@ use std::fs;
 use std::io::{Read, Write};
 use std::path::{Component, Path, PathBuf};
 use std::process::{Child, Command, Stdio};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Mutex, OnceLock};
 use std::thread;
 use std::time::{Duration, Instant};
 use tauri::{AppHandle, Manager};
 
 static COMFYUI_PROCESS: OnceLock<Mutex<Option<Child>>> = OnceLock::new();
+static COMFYUI_GENERATION_CANCELLED: AtomicBool = AtomicBool::new(false);
 
 fn comfyui_process() -> &'static Mutex<Option<Child>> {
     COMFYUI_PROCESS.get_or_init(|| Mutex::new(None))
@@ -69,6 +71,32 @@ pub(crate) struct ComfyUIImageGenerationResponse {
     image: ComfyUIGeneratedImage,
 }
 
+#[tauri::command]
+pub fn get_image_generator_settings(app: AppHandle) -> Result<ImageGeneratorSettings, String> {
+    Ok(read_settings(&app).image_generator)
+}
+
+#[tauri::command]
+pub fn set_image_generator_settings(
+    app: AppHandle,
+    settings: ImageGeneratorSettings,
+) -> Result<(), String> {
+    let mut launcher_settings: LauncherSettings = read_settings(&app);
+    let use_local_comfyui_url = settings.use_local_comfyui_url;
+    let comfyui_url = if use_local_comfyui_url {
+        COMFYUI_URL.to_string()
+    } else {
+        normalize_comfyui_url(&settings.comfyui_url)?
+    };
+
+    launcher_settings.image_generator = ImageGeneratorSettings {
+        use_local_comfyui_url,
+        comfyui_url,
+    };
+
+    write_settings(&app, &launcher_settings)
+}
+
 pub(crate) fn comfyui_runtime_dir(app: &AppHandle) -> Result<PathBuf, String> {
     app.path()
         .app_data_dir()
@@ -118,6 +146,20 @@ pub(crate) fn comfyui_install_marker(app: &AppHandle) -> Result<PathBuf, String>
 
 pub(crate) fn comfyui_ready() -> bool {
     tcp_service_ready(COMFYUI_ADDR)
+}
+
+fn normalize_comfyui_url(url: &str) -> Result<String, String> {
+    let url = url.trim().trim_end_matches('/').to_string();
+
+    if url.is_empty() {
+        return Err("L'URL ComfyUI est obligatoire.".to_string());
+    }
+
+    if !(url.starts_with("http://") || url.starts_with("https://")) {
+        return Err("L'URL ComfyUI doit commencer par http:// ou https://.".to_string());
+    }
+
+    Ok(url)
 }
 
 pub(crate) fn comfyui_installed(app: &AppHandle) -> bool {
@@ -226,6 +268,42 @@ fn download_url(url: &str) -> Result<&str, String> {
     Ok(url)
 }
 
+fn validate_safetensors_file(path: &Path) -> Result<(), String> {
+    let file_size = fs::metadata(path).map_err(|e| e.to_string())?.len();
+
+    if file_size < 16 {
+        return Err("Le fichier Safetensors est trop petit.".to_string());
+    }
+
+    let mut file = fs::File::open(path).map_err(|e| e.to_string())?;
+    let mut header_size_bytes = [0u8; 8];
+    file.read_exact(&mut header_size_bytes)
+        .map_err(|e| e.to_string())?;
+
+    let header_size = u64::from_le_bytes(header_size_bytes);
+
+    if header_size == 0 || file_size < 8 + header_size {
+        return Err("Le fichier Safetensors a un en-tête invalide.".to_string());
+    }
+
+    let mut header = vec![0u8; header_size as usize];
+    file.read_exact(&mut header).map_err(|e| e.to_string())?;
+    serde_json::from_slice::<Value>(&header)
+        .map(|_| ())
+        .map_err(|_| "Le fichier téléchargé n'est pas un Safetensors valide.".to_string())
+}
+
+fn validate_model_file(path: &Path) -> Result<(), String> {
+    if path
+        .extension()
+        .is_some_and(|extension| extension.eq_ignore_ascii_case("safetensors"))
+    {
+        return validate_safetensors_file(path);
+    }
+
+    Ok(())
+}
+
 fn prompt_id_path(prompt_id: &str) -> Result<String, String> {
     if prompt_id.is_empty()
         || !prompt_id
@@ -282,7 +360,8 @@ pub(crate) fn get_model_availability(
         .map(|model| {
             let is_downloaded = !model.downloads.is_empty()
                 && model.downloads.iter().all(|download| {
-                    model_file_path(&models_dir, download).is_ok_and(|path| path.exists())
+                    model_file_path(&models_dir, download)
+                        .is_ok_and(|path| path.exists() && validate_model_file(&path).is_ok())
                 });
 
             ComfyUIModelAvailability {
@@ -368,14 +447,24 @@ pub(crate) fn download_model_files(
         fs::create_dir_all(&target_dir).map_err(|e| e.to_string())?;
 
         if destination.exists() {
-            emit_runtime_log(
-                app,
-                format!(
-                    "{file_name} est déjà présent dans models/{}.",
-                    destination_directory.to_string_lossy()
-                ),
-            );
-            continue;
+            match validate_model_file(&destination) {
+                Ok(()) => {
+                    emit_runtime_log(
+                        app,
+                        format!(
+                            "{file_name} est déjà présent dans models/{}.",
+                            destination_directory.to_string_lossy()
+                        ),
+                    );
+                    continue;
+                }
+                Err(error) => {
+                    emit_runtime_log(
+                        app,
+                        format!("{file_name} est invalide ({error}). Nouveau téléchargement."),
+                    );
+                }
+            }
         }
 
         let partial_destination = target_dir.join(format!("{file_name}.assistia-download"));
@@ -401,6 +490,10 @@ pub(crate) fn download_model_files(
             &format!("Téléchargement de {file_name}"),
         )?;
 
+        validate_model_file(&partial_destination)?;
+        if destination.exists() {
+            fs::remove_file(&destination).map_err(|e| e.to_string())?;
+        }
         fs::rename(&partial_destination, &destination).map_err(|e| e.to_string())?;
     }
 
@@ -520,6 +613,38 @@ fn get_comfyui_json(path: &str) -> Result<Value, String> {
     request_comfyui_json("GET", path, None)
 }
 
+fn post_comfyui_interrupt() -> Result<(), String> {
+    let body = "{}";
+    let request = format!(
+        "POST /interrupt HTTP/1.1\r\nHost: {COMFYUI_ADDR}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+        body.len()
+    );
+    let mut stream = std::net::TcpStream::connect(COMFYUI_ADDR).map_err(|e| e.to_string())?;
+
+    stream
+        .set_read_timeout(Some(Duration::from_secs(10)))
+        .map_err(|e| e.to_string())?;
+    stream
+        .set_write_timeout(Some(Duration::from_secs(10)))
+        .map_err(|e| e.to_string())?;
+    stream
+        .write_all(request.as_bytes())
+        .map_err(|e| e.to_string())?;
+
+    let mut response = Vec::new();
+    stream
+        .read_to_end(&mut response)
+        .map_err(|e| e.to_string())?;
+
+    let response_start = String::from_utf8_lossy(&response[..response.len().min(64)]);
+
+    if response_start.starts_with("HTTP/1.1 200") || response_start.starts_with("HTTP/1.0 200") {
+        return Ok(());
+    }
+
+    Err("ComfyUI n'a pas accepté la demande d'interruption.".to_string())
+}
+
 fn find_first_generated_image(history: &Value, prompt_id: &str) -> Option<ComfyUIImageReference> {
     let outputs = history.get(prompt_id)?.get("outputs")?.as_object()?;
 
@@ -620,6 +745,10 @@ fn wait_for_generated_image(
     let history_path = prompt_id_path(prompt_id)?;
 
     while started_at.elapsed() < timeout {
+        if COMFYUI_GENERATION_CANCELLED.load(Ordering::Relaxed) {
+            return Err("Génération ComfyUI interrompue.".to_string());
+        }
+
         let elapsed = started_at.elapsed().as_secs();
         let progress = 94 + ((elapsed.min(timeout.as_secs()) * 5) / timeout.as_secs()) as u8;
 
@@ -655,6 +784,7 @@ pub(crate) fn queue_image_generation(
         return Err("ComfyUI n'est pas démarré.".to_string());
     }
 
+    COMFYUI_GENERATION_CANCELLED.store(false, Ordering::Relaxed);
     emit_runtime_status(app, "Envoi du workflow à ComfyUI...", 92);
 
     let response = post_comfyui_json("/prompt", json!({ "prompt": workflow }))?;
@@ -678,6 +808,19 @@ pub(crate) fn queue_image_generation(
         number,
         image,
     })
+}
+
+pub(crate) fn interrupt_image_generation(app: &AppHandle) -> Result<bool, String> {
+    COMFYUI_GENERATION_CANCELLED.store(true, Ordering::Relaxed);
+
+    if !comfyui_ready() {
+        return Ok(false);
+    }
+
+    emit_runtime_log(app, "Interruption de la génération ComfyUI.");
+    post_comfyui_interrupt()?;
+
+    Ok(true)
 }
 
 #[cfg(target_os = "macos")]

@@ -41,6 +41,8 @@ import { useDeveloperAgentSettings }
 from "./hooks/useDeveloperAgentSettings";
 import { useImageGeneratorModelAvailability }
 from "./hooks/useImageGeneratorModelAvailability";
+import { useImageGeneratorSettings }
+from "./hooks/useImageGeneratorSettings";
 import { useImageGeneratorModelActions }
 from "./hooks/useImageGeneratorModelActions";
 import { useRuntimeOperations }
@@ -166,6 +168,15 @@ export default function App() {
   } = useWebSearchSettings();
 
   const {
+    imageGeneratorSettings,
+    imageGeneratorSettingsFeedback,
+    isLoadingImageGeneratorSettings,
+    isSavingImageGeneratorSettings,
+    saveImageGeneratorSettings,
+    updateImageGeneratorSetting
+  } = useImageGeneratorSettings();
+
+  const {
     downloadedModels: downloadedImageModels,
     isLoadingModelAvailability: isLoadingImageModelAvailability,
     modelAvailability: imageModelAvailability,
@@ -179,10 +190,12 @@ export default function App() {
   } = useChatModelAvailability();
 
   const {
+    chatImageModelName,
     progress: runtimeProgress,
     status: runtimeProgressStatus,
     logs,
     clearLogs,
+    setChatImageModelName,
     setProgress,
     setStatus
   } = useLauncherStore();
@@ -282,6 +295,9 @@ export default function App() {
 
   const isRequiredComponentsInstalled =
     isOllamaInstalled;
+
+  const chatImageModel =
+    downloadedImageModels.find((model) => model.name === chatImageModelName);
 
   const installableComponents = [
     {
@@ -403,6 +419,24 @@ export default function App() {
     isOllamaInstalled,
     isOllamaRunning,
     refreshChatModelAvailability
+  ]);
+
+  useEffect(() => {
+    if (downloadedImageModels.length === 0) {
+      if (chatImageModelName !== "") {
+        setChatImageModelName("");
+      }
+
+      return;
+    }
+
+    if (!downloadedImageModels.some((model) => model.name === chatImageModelName)) {
+      setChatImageModelName(downloadedImageModels[0].name);
+    }
+  }, [
+    chatImageModelName,
+    downloadedImageModels,
+    setChatImageModelName
   ]);
 
   useEffect(() => {
@@ -604,7 +638,9 @@ export default function App() {
         <ChatPage
           availableModels={installedChatModels}
           installationFeedback={requiredComponentsInstallationFeedback}
+          imageGenerationModel={chatImageModel}
           isLoadingModels={isLoadingChatModelAvailability}
+          isComfyUIRunning={isComfyUIRunning}
           isOllamaInstalled={isOllamaInstalled}
           isOllamaRunning={isOllamaRunning}
           labels={labels.pages.chat}
@@ -657,8 +693,11 @@ export default function App() {
       return (
         <SettingsPage
           chatHistorySecurityState={chatHistorySecurityState}
+          chatImageModelName={chatImageModelName}
           developerAgentSettings={developerAgentSettings}
           developerAgentSettingsFeedback={developerAgentSettingsFeedback}
+          imageGeneratorSettings={imageGeneratorSettings}
+          imageGeneratorSettingsFeedback={imageGeneratorSettingsFeedback}
           chatModelAction={chatModelAction}
           chatModelActionFeedback={chatModelActionFeedback}
           chatModels={installedChatModels}
@@ -675,10 +714,12 @@ export default function App() {
           isLoadingChatModels={isLoadingChatModelAvailability}
           isLoadingChatHistorySecurity={isLoadingChatHistorySecurity}
           isLoadingImageModels={isLoadingImageModelAvailability}
+          isLoadingImageGeneratorSettings={isLoadingImageGeneratorSettings}
           isLoadingWebSearchSettings={isLoadingWebSearchSettings}
           isOllamaInstalled={isOllamaInstalled}
           isRequiredComponentsInstalled={isRequiredComponentsInstalled}
           isSavingDeveloperAgentSettings={isSavingDeveloperAgentSettings}
+          isSavingImageGeneratorSettings={isSavingImageGeneratorSettings}
           isSavingWebSearchSettings={isSavingWebSearchSettings}
           labels={labels}
           logs={translatedLogs}
@@ -686,6 +727,8 @@ export default function App() {
           webSearchSettings={webSearchSettings}
           webSearchSettingsFeedback={webSearchSettingsFeedback}
           onDeveloperAgentSettingChange={updateDeveloperAgentSetting}
+          onChatImageModelChange={setChatImageModelName}
+          onImageGeneratorSettingChange={updateImageGeneratorSetting}
           onWebSearchSettingChange={updateWebSearchSetting}
           onChangeChatHistoryPassword={changeChatHistoryPassword}
           onDeleteChatModel={deleteChatModel}
@@ -698,6 +741,7 @@ export default function App() {
           onInstallRequiredComponents={installRequiredComponents}
           onInstallWebSearch={installSearXNG}
           onSaveDeveloperAgentSettings={saveDeveloperAgentSettings}
+          onSaveImageGeneratorSettings={saveImageGeneratorSettings}
           onSaveWebSearchSettings={saveWebSearchSettings}
         />
       );
